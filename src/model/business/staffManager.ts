@@ -133,13 +133,13 @@ export async function login(loginParams: any, ip: string) {
  * 退出登录
  */
 export async function signOut(cookie: any) {
-    let userID = cookie.get("auth_id");
+    let userID = cookie.get(memcachedPrefix.projectPrefix  +"id");
     await Memcached.set(memcachedPrefix.projectPrefix  + "staff_" + userID + "_token", "");
-    cookie.set("auth_id", null);
-    cookie.set("auth_token", null);
-    cookie.set("auth_name", null);
-    cookie.set("auth_type", null);
-    cookie.set("auth_sysRight", null);
+    cookie.set(memcachedPrefix.projectPrefix  +"id", null);
+    cookie.set(memcachedPrefix.projectPrefix  +"token", null);
+    cookie.set(memcachedPrefix.projectPrefix  +"name", null);
+    cookie.set(memcachedPrefix.projectPrefix  +"type", null);
+    cookie.set(memcachedPrefix.projectPrefix  +"sysRight", null);
     throw { status: 401 };
 }
 

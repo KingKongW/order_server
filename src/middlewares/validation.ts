@@ -11,8 +11,8 @@ export function tokenValidation(next: any) {
         if (notTokenValidation) {
             yield next;
         } else {
-            let userId = this.cookies.get("auth_id");
-            let token = this.cookies.get("auth_token");
+            let userId = this.cookies.get(memcachedPrefix.projectPrefix  +"id");
+            let token = this.cookies.get(memcachedPrefix.projectPrefix  +"token");
 
             if (_.isEmpty(userId) || _.isEmpty(token)) this.throw(401);
 

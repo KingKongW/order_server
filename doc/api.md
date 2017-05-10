@@ -24,7 +24,7 @@
 
 	参数名 | 类型 | 必须 | 描述
  	:------|:----:|:-------:|:--------
- 	token | string | M | 用户token标识，登录后接口必须穿
+ 	UserCenter_token | string | M | 用户token标识，登录后接口必须穿
 
 - **body**  
   body内容为json文本

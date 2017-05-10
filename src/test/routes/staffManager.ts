@@ -1,7 +1,7 @@
 let app = require("./../../app");
 let request = require("supertest").agent(app.listen());
-import { get, post, del } from "./token";
 import * as Memcached from "../../utils/memcached";
+import { memcachedPrefix } from "../../config/config";
 import * as utils from "../../utils/utils";
 import * as Chai from "chai";
 
@@ -9,7 +9,7 @@ let id: number = 4;
 let token: string;
 let prefixUrlWeb = "/webclient/api";
 let verificationCode = "UserCenter_staff_3_token";
-let cookie: string;
+let cookie: string = "";
 let modelList: any = [
     { "id": 2, "loginName": "tianjy", "name": "tianjy", "sex": 1, "contactTel": "s", "email": "e@12.com", "isvalid": 1 },
     { "id": 3, "loginName": "wangsy", "name": "wangsy", "sex": 1, "contactTel": "f", "email": "e", "isvalid": 1 }];
@@ -106,7 +106,10 @@ describe("post /webclient/api/modifyPWD", () => {
         Chai.expect(result.type).to.eq(1);
         Chai.expect(result.isChangePwd).to.eq(0);
         token = result.token;
-        cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
+        cookie = memcachedPrefix.projectPrefix + "name=" + result.name + ";"
+            + memcachedPrefix.projectPrefix + "token=" + result.token + "; "
+            + memcachedPrefix.projectPrefix + "id=" + result.id + "; "
+            + memcachedPrefix.projectPrefix + "loginName=" + result.loginName + ";";
         let cookiesToken: any = await Memcached.get(verificationCode);
         Chai.expect(cookiesToken).to.eq(token);
         return;
@@ -168,7 +171,7 @@ describe(" post /webclient/api/staff", () => {
         Chai.expect(result.type).to.eq(1);
         Chai.expect(result.isChangePwd).to.eq(0);
         token = result.token;
-        cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
+        // cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
         let cookiesToken: any = await Memcached.get(verificationCode);
         Chai.expect(cookiesToken).to.eq(token);
         return;
@@ -304,7 +307,7 @@ describe(" delete /webclient/api/staff/:id", () => {
         Chai.expect(result.type).to.eq(1);
         Chai.expect(result.isChangePwd).to.eq(0);
         token = result.token;
-        cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
+        // cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
         let cookiesToken: any = await Memcached.get(verificationCode);
         Chai.expect(cookiesToken).to.eq(token);
         return;
@@ -382,7 +385,7 @@ describe(" get /webclient/api/staff/:id", () => {
         Chai.expect(result.type).to.eq(1);
         Chai.expect(result.isChangePwd).to.eq(0);
         token = result.token;
-        cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
+        // cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
         let cookiesToken: any = await Memcached.get(verificationCode);
         Chai.expect(cookiesToken).to.eq(token);
         return;
@@ -435,7 +438,7 @@ describe(" post /webclient/api/staff/resetPwd", () => {
         Chai.expect(result.type).to.eq(1);
         Chai.expect(result.isChangePwd).to.eq(0);
         token = result.token;
-        cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
+        // cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
         let cookiesToken: any = await Memcached.get(verificationCode);
         Chai.expect(cookiesToken).to.eq(token);
         return;

@@ -2,6 +2,7 @@ import * as router from "koa-router";
 import * as utils from "../utils/utils";
 import * as staff from "../model/business/staffManager";
 import { checkPageParams } from "../middlewares/page";
+import { memcachedPrefix } from "../config/config";
 import * as errorMsg from "../config/error_msg";
 
 export = function (router: router) {
@@ -90,7 +91,7 @@ async function login() {
 
 - **响应header**
 
-  `status: 401 , auth_id: null, auth_token: null`
+  `status: 401 
  */
 async function signOut() {
   this.body = await staff.signOut(this.cookies);
@@ -126,7 +127,7 @@ async function modifyPWD() {
   this.checkBody("newPwd").notEmpty("新密码不能为空！").neq(body.oldPwd, "新旧密码不能相同！");
   utils.throwValidatorError(this.errors);
 
-  await staff.modifyPWD(this.cookies.get("auth_id"), body.oldPwd, body.newPwd);
+  await staff.modifyPWD(this.cookies.get(memcachedPrefix.projectPrefix  +"id"), body.oldPwd, body.newPwd);
   this.body = {};
 }
 

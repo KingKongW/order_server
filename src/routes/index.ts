@@ -13,6 +13,6 @@ export = function (app: Koa) {
 
 
     // todo 暂时屏蔽token及权限验证
-    app.use(convert(tokenValidation({})));
+    // app.use(convert(tokenValidation({})));
     app.use(convert(router.routes())).use(convert(router.allowedMethods()));
 };

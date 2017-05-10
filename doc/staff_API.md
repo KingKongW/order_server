@@ -64,7 +64,7 @@
 
 - **响应header**
 
-  `status: 401 , auth_id: null, auth_token: null`
+  `status: 401 
 
 
 ### 1.4 修改密码   ###
