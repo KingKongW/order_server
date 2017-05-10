@@ -8,7 +8,7 @@ import * as Chai from "chai";
 let id: number = 4;
 let token: string;
 let prefixUrlWeb = "/webclient/api";
-let verificationCode = "staff_3_token";
+let verificationCode = "UserCenter_staff_3_token";
 let cookie: string;
 let modelList: any = [
     { "id": 2, "loginName": "tianjy", "name": "tianjy", "sex": 1, "contactTel": "s", "email": "e@12.com", "isvalid": 1 },
@@ -18,7 +18,7 @@ let modelList: any = [
 describe("post /webclient/api/login", () => {
     it(" success: login", async () => {
 
-        await Memcached.set("auth_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
+        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
 
         let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
         let result = res.body;
@@ -65,7 +65,7 @@ describe("post /webclient/api/login", () => {
 describe("post /webclient/api/signOut", () => {
     it(" success: login", async () => {
 
-        await Memcached.set("auth_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
+        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
 
         let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
         let result = res.body;
@@ -95,7 +95,7 @@ describe("post /webclient/api/modifyPWD", () => {
 
     it(" success: login", async () => {
 
-        await Memcached.set("auth_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
+        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
 
         let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
         let result = res.body;
@@ -157,7 +157,7 @@ describe(" post /webclient/api/staff", () => {
 
     it(" success: login", async () => {
 
-        await Memcached.set("auth_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
+        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
 
         let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
         let result = res.body;
@@ -293,7 +293,7 @@ describe(" delete /webclient/api/staff/:id", () => {
 
     it(" success: login", async () => {
 
-        await Memcached.set("auth_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
+        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
 
         let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
         let result = res.body;
@@ -371,7 +371,7 @@ describe(" get /webclient/api/staff/:id", () => {
 
     it(" success: login", async () => {
 
-        await Memcached.set("auth_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
+        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
 
         let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
         let result = res.body;
@@ -424,7 +424,7 @@ describe(" post /webclient/api/staff/resetPwd", () => {
 
     it(" success: login", async () => {
 
-        await Memcached.set("auth_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
+        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
 
         let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
         let result = res.body;

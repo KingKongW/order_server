@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import * as db from "../model/dao/db";
-import { withoutTokenValidationURL } from "../config/config";
+import { withoutTokenValidationURL, memcachedPrefix } from "../config/config";
 import * as Memcached from "../utils/memcached";
 
 export function tokenValidation(next: any) {
@@ -16,7 +16,7 @@ export function tokenValidation(next: any) {
 
             if (_.isEmpty(userId) || _.isEmpty(token)) this.throw(401);
 
-            let tokenValue: any = yield Memcached.get("staff_" + userId + "_token");
+            let tokenValue: any = yield Memcached.get(memcachedPrefix.projectPrefix + "staff_" + userId + "_token");
 
             if (!!tokenValue && token === tokenValue) {
                 yield next;

@@ -87,7 +87,7 @@ export async function deleteStaff(staffId: number) {
         },
         hooks: true
     };
-    await Memcached.del("staff_" + staff.id + "_token");
+    await Memcached.del(memcachedPrefix.projectPrefix +"staff_" + staff.id + "_token");
     return await db.Staff.destroy(queryParams);
 };
 
@@ -96,7 +96,9 @@ export async function deleteStaff(staffId: number) {
  * @param loginParams 登录信息
  */
 export async function login(loginParams: any, ip: string) {
-    let wrongNum: any, wrongNumMemcachedKey: string = memcachedPrefix.projectPrefix + ip + memcachedPrefix.wrongNumSuffix, vcodeKey: string = memcachedPrefix.projectPrefix + ip + memcachedPrefix.verificationCodeSuffix;
+    let wrongNum: any, 
+    wrongNumMemcachedKey: string = memcachedPrefix.projectPrefix + ip + memcachedPrefix.wrongNumSuffix, 
+    vcodeKey: string = memcachedPrefix.projectPrefix + ip + memcachedPrefix.verificationCodeSuffix;
     wrongNum = await Memcached.get(wrongNumMemcachedKey);
     if (wrongNum >= MAX_WRONG_NUM) {
         if (!loginParams.verificationCode) {
@@ -120,7 +122,7 @@ export async function login(loginParams: any, ip: string) {
 
     let tokenValue: any = token(loginParams);
     wrongNum = 0;
-    await Memcached.set("staff_" + user.id + "_token", tokenValue);
+    await Memcached.set(memcachedPrefix.projectPrefix  +"staff_" + user.id + "_token", tokenValue);
     await Memcached.set(wrongNumMemcachedKey, wrongNum, WRONG_NUM_TIME);
 
 
@@ -132,7 +134,7 @@ export async function login(loginParams: any, ip: string) {
  */
 export async function signOut(cookie: any) {
     let userID = cookie.get("auth_id");
-    await Memcached.set("staff_" + userID + "_token", "");
+    await Memcached.set(memcachedPrefix.projectPrefix  + "staff_" + userID + "_token", "");
     cookie.set("auth_id", null);
     cookie.set("auth_token", null);
     cookie.set("auth_name", null);
@@ -206,7 +208,7 @@ export async function checkToken(id: number, tokenValue: string) {
     if (_.isEmpty(staff)) throw errorMsg.objectNotExsitFn("用户");
 
 
-    let _token = await Memcached.get("staff_" + staff.id + "_token");
+    let _token = await Memcached.get(memcachedPrefix.projectPrefix + "staff_" + staff.id + "_token");
     if (_.isEmpty(_token)) throw errorMsg.tokenHasGone();
     else if (_token !== tokenValue) throw errorMsg.isWrong("token");
 

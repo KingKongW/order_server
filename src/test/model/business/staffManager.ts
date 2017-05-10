@@ -20,7 +20,7 @@ describe("Staff.getVerificationCode()", () => {
 describe("Staff.login()", () => {
     it(" success: login", async () => {
         //设置验证码
-        await Memcached.set("auth_127.0.0.1_verificationCode", "test_staff_wangsy_token".toUpperCase(), 60 * 60 * 24 * 2);
+        await Memcached.set("UserCenter_127.0.0.1_verificationCode", "test_staff_wangsy_token".toUpperCase(), 60 * 60 * 24 * 2);
 
         let result: any = await Staff.login({ account: "wangsy", password: utils.md5('123456'), verificationCode: "test_staff_wangsy_token" }, "127.0.0.1");
         Chai.expect(result).to.include.keys(["id", "name", "token", "type", "isChangePwd"]);
@@ -275,7 +275,7 @@ describe("Staff.checkToken()", () => {
 
     it(" success: login", async () => {
         //设置验证码
-        await Memcached.set("auth_127.0.0.1_verificationCode", "test_staff_wangsy_token".toUpperCase(), 60 * 60 * 24 * 2);
+        await Memcached.set("UserCenter_127.0.0.1_verificationCode", "test_staff_wangsy_token".toUpperCase(), 60 * 60 * 24 * 2);
 
         let result: any = await Staff.login({ account: "wangsy", password: utils.md5('123456'), verificationCode: "test_staff_wangsy_token" }, "127.0.0.1");
         Chai.expect(result).to.include.keys(["id", "name", "token", "type", "isChangePwd"]);

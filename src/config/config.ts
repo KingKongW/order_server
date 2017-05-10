@@ -6,9 +6,6 @@ export const LOG_PATH: string = path.resolve(__dirname, "..", "logs/");
 
 export const PAGE_SIZE = 20;
 
-export const PROJECTNAME = "UserCenter_";
-
-
 export const server: any = {
     level: "",
     db: {
@@ -37,7 +34,7 @@ export const withoutTokenValidationURL: any = [
 
 
 export const memcachedPrefix: any = {
-    projectPrefix: "auth_",
+    projectPrefix: "UserCenter_",
     wrongNumSuffix: "_wrongNum",
     verificationCodeSuffix: "_verificationCode"
 };
