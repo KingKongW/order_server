@@ -62,6 +62,7 @@ describe("post /webclient/api/login", () => {
 
 
 describe("post /webclient/api/signOut", () => {
+    let id: number;
     it(" success: login", async () => {
 
         await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
@@ -76,11 +77,35 @@ describe("post /webclient/api/signOut", () => {
         token = result.token;
         let cookiesToken: any = await Memcached.get(verificationCode);
         Chai.expect(cookiesToken).to.eq(token);
+        id = result.id;
         return;
     });
 
+     let errorParams: any = [{
+        body: { id: "" },
+        errorMsg: "用户ID不能为空！",
+        title: "the id is empty"
+    }, {
+        body: { id: "sdfsdf" },
+        errorMsg: "用户ID值错误！",
+        title: "the id is string"
+    }, {
+        body: { id: "0" },
+        errorMsg: "用户ID值错误！",
+        title: "the id is less than 1"
+    }];
+    for (let errorParam of errorParams) {
+        it(" failed:  " + errorParam.title, async () => {
+            let res = await request.post(prefixUrlWeb + "/signOut")
+                .send(errorParam.body);
+            let result = res.body;
+            Chai.expect(res.status).to.eql(403);
+            Chai.expect(res.body.errorMsg).to.eql(errorParam.errorMsg);
+        });
+    }
+
     it(" success: signOut", async () => {
-        let res: any = await request.post(prefixUrlWeb + "/signOut").send({});
+        let res: any = await request.post(prefixUrlWeb + "/signOut").send({ id: id });
         Chai.expect(res.status).to.eql(401);
         return;
     });
@@ -93,7 +118,6 @@ describe("post /webclient/api/modifyPWD", () => {
 
     it(" success: modifyPWD", async () => {
         let res: any = await request.post(prefixUrlWeb + "/modifyPWD")
-            .set("cookie", cookie)
             .send({ id: modelList[0].id, oldPwd: utils.md5('111111'), newPwd: utils.md5('123456') });
         Chai.expect(res.status).to.eql(200);
         return;
@@ -101,7 +125,6 @@ describe("post /webclient/api/modifyPWD", () => {
 
     it(" success: modifyPWD", async () => {
         let res: any = await request.post(prefixUrlWeb + "/modifyPWD")
-            .set("cookie", cookie)
             .send({ id: modelList[0].id, oldPwd: utils.md5('123456'), newPwd: utils.md5('111111') });
         Chai.expect(res.status).to.eql(200);
         return;
@@ -135,7 +158,6 @@ describe("post /webclient/api/modifyPWD", () => {
     for (let errorParam of errorParams) {
         it(" failed:  " + errorParam.title, async () => {
             let res = await request.post(prefixUrlWeb + "/modifyPWD")
-                .set("cookie", cookie)
                 .send(errorParam.body);
             let result = res.body;
             Chai.expect(res.status).to.eql(403);
@@ -168,14 +190,14 @@ describe(" post /webclient/api/staff", () => {
         isvalid: 0
     };
     it(" success: create", async () => {
-        let res = await request.post(prefixUrlWeb + "/staff").set("cookie", cookie).send(createParam);
+        let res = await request.post(prefixUrlWeb + "/staff").send(createParam);
         let result = res.body;
         Chai.expect(res.status).to.eql(200);
         return;
     });
 
     it(" success: find the new staff", async () => {
-        let res = await request.get(prefixUrlWeb + "/staff?pageIndex=-1&pageSize=20&keywords=" + random).set("cookie", cookie);
+        let res = await request.get(prefixUrlWeb + "/staff?pageIndex=-1&pageSize=20&keywords=" + random);
         let result = res.body.data[res.body.data.length - 1];
         Chai.expect(res.status).to.eql(200);
         Chai.expect(result.loginName).to.eq(createParam.loginName);
@@ -187,13 +209,13 @@ describe(" post /webclient/api/staff", () => {
     });
 
     it(" success: update", async () => {
-        let res = await request.post(prefixUrlWeb + "/staff").set("cookie", cookie).send(updateParam);
+        let res = await request.post(prefixUrlWeb + "/staff").send(updateParam);
         let result = res.body;
         Chai.expect(res.status).to.eql(200);
     });
 
     it(" success: find the new staff", async () => {
-        let res = await request.get(prefixUrlWeb + "/staff?pageIndex=-1&pageSize=20&keywords=" + random).set("cookie", cookie);
+        let res = await request.get(prefixUrlWeb + "/staff?pageIndex=-1&pageSize=20&keywords=" + random);
         let result = res.body.data[res.body.data.length - 1];
         Chai.expect(res.status).to.eql(200);
         Chai.expect(result.loginName).to.eq(updateParam.loginName);
@@ -205,7 +227,7 @@ describe(" post /webclient/api/staff", () => {
     });
 
     it(" success: delete the new staff", async () => {
-        let res = await request.delete(prefixUrlWeb + "/staff/" + updateParam.id).set("cookie", cookie);
+        let res = await request.delete(prefixUrlWeb + "/staff/" + updateParam.id);
         Chai.expect(res.status).to.eql(200);
         return;
     });
@@ -253,7 +275,7 @@ describe(" post /webclient/api/staff", () => {
     }];
     for (let errorParam of errorParams) {
         it(" failed:  " + errorParam.title, async () => {
-            let res = await request.post(prefixUrlWeb + "/staff").set("cookie", cookie).send(errorParam.body);
+            let res = await request.post(prefixUrlWeb + "/staff").send(errorParam.body);
             let result = res.body;
             Chai.expect(res.status).to.eql(403);
             Chai.expect(res.body.errorMsg).to.eql(errorParam.errorMsg);
@@ -275,14 +297,14 @@ describe(" delete /webclient/api/staff/:id", () => {
         isvalid: 1
     };
     it(" success: create", async () => {
-        let res = await request.post(prefixUrlWeb + "/staff").set("cookie", cookie).send(createParam);
+        let res = await request.post(prefixUrlWeb + "/staff").send(createParam);
         let result = res.body;
         Chai.expect(res.status).to.eql(200);
         return;
     });
 
     it(" success: find the new staff", async () => {
-        let res = await request.get(prefixUrlWeb + "/staff?pageIndex=-1&pageSize=20&keywords=" + random).set("cookie", cookie);
+        let res = await request.get(prefixUrlWeb + "/staff?pageIndex=-1&pageSize=20&keywords=" + random);
         let result = res.body.data[res.body.data.length - 1];
         Chai.expect(res.status).to.eql(200);
         Chai.expect(result.loginName).to.eq(createParam.loginName);
@@ -295,7 +317,7 @@ describe(" delete /webclient/api/staff/:id", () => {
 
 
     it(" success: delete the new staff", async () => {
-        let res = await request.delete(prefixUrlWeb + "/staff/" + id).set("cookie", cookie);
+        let res = await request.delete(prefixUrlWeb + "/staff/" + id);
         Chai.expect(res.status).to.eql(200);
         return;
     });
@@ -311,7 +333,7 @@ describe(" delete /webclient/api/staff/:id", () => {
     }];
     for (let errorParam of errorParams) {
         it(" failed:  " + errorParam.title, async () => {
-            let res = await request.delete(prefixUrlWeb + "/staff/" + errorParam.body.id).set("cookie", cookie);
+            let res = await request.delete(prefixUrlWeb + "/staff/" + errorParam.body.id);
             let result = res.body;
             Chai.expect(res.status).to.eql(403);
             Chai.expect(res.body.errorMsg).to.eql(errorParam.errorMsg);
@@ -322,7 +344,7 @@ describe(" delete /webclient/api/staff/:id", () => {
 describe(" get /webclient/api/staff/:id", () => {
 
     it(" success: get a staff info", async () => {
-        let res = await request.get(prefixUrlWeb + "/staff/" + modelList[0].id).set("cookie", cookie);
+        let res = await request.get(prefixUrlWeb + "/staff/" + modelList[0].id);
         let result = res.body;
         Chai.expect(res.status).to.eql(200);
         Chai.expect(result.loginName).to.eq(modelList[0].loginName);
@@ -343,7 +365,7 @@ describe(" get /webclient/api/staff/:id", () => {
     }];
     for (let errorParam of errorParams) {
         it(" failed:  " + errorParam.title, async () => {
-            let res = await request.get(prefixUrlWeb + "/staff/" + errorParam.body.id).set("cookie", cookie);
+            let res = await request.get(prefixUrlWeb + "/staff/" + errorParam.body.id);
             let result = res.body;
             Chai.expect(res.status).to.eql(403);
             Chai.expect(res.body.errorMsg).to.eql(errorParam.errorMsg);
@@ -356,7 +378,7 @@ describe(" get /webclient/api/staff/:id", () => {
 describe(" post /webclient/api/staff/resetPwd", () => {
 
     it(" success: resetPwd", async () => {
-        let res = await request.post(prefixUrlWeb + "/staff/resetPwd").set("cookie", cookie).send({ id: modelList[0].id, password: utils.md5("111111") });
+        let res = await request.post(prefixUrlWeb + "/staff/resetPwd").send({ id: modelList[0].id, password: utils.md5("111111") });
         let result = res.body;
         Chai.expect(res.status).to.eql(200);
         return;
@@ -391,7 +413,7 @@ describe(" post /webclient/api/staff/resetPwd", () => {
     }];
     for (let errorParam of errorParams) {
         it(" failed:  " + errorParam.title, async () => {
-            let res = await request.post(prefixUrlWeb + "/staff/resetPwd").set("cookie", cookie).send(errorParam.body);
+            let res = await request.post(prefixUrlWeb + "/staff/resetPwd").send(errorParam.body);
             let result = res.body;
             Chai.expect(res.status).to.eql(403);
             Chai.expect(res.body.errorMsg).to.eql(errorParam.errorMsg);

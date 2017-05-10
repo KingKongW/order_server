@@ -132,9 +132,8 @@ export async function login(loginParams: any, ip: string) {
 /**
  * 退出登录
  */
-export async function signOut(cookie: any) {
-    let userID = cookie.get(memcachedPrefix.projectPrefix + "id");
-    await Memcached.set(memcachedPrefix.projectPrefix + "staff_" + userID + "_token", "");
+export async function signOut(staffId: number) {
+    await Memcached.set(memcachedPrefix.projectPrefix + "staff_" + staffId + "_token", "");
     throw { status: 401 };
 }
 

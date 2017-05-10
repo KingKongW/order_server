@@ -15,7 +15,7 @@ export = function (router: router) {
   router.delete("/webclient/api/staff/:id", deleteStaff);
   router.get("/webclient/api/staff/:id", getStaffInfo);
   router.post("/webclient/api/staff/resetPwd", resetPassword);
-  router.post("/webclient/api/staff/token", checkToken);
+  router.post("/webclient/api/staff/verification", checkToken);
 
 };
 
@@ -94,7 +94,10 @@ async function login() {
   `status: 401 
  */
 async function signOut() {
-  this.body = await staff.signOut(this.cookies);
+  let body = this.request.body;
+  this.checkBody("id").notEmpty("用户ID不能为空！").isInt("用户ID值错误！", { min: 1 });
+  utils.throwValidatorError(this.errors);
+  this.body = await staff.signOut(body.id);
 };
 
 
