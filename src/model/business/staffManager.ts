@@ -87,7 +87,7 @@ export async function deleteStaff(staffId: number) {
         },
         hooks: true
     };
-    await Memcached.del(memcachedPrefix.projectPrefix +"staff_" + staff.id + "_token");
+    await Memcached.del(memcachedPrefix.projectPrefix + "staff_" + staff.id + "_token");
     return await db.Staff.destroy(queryParams);
 };
 
@@ -96,9 +96,9 @@ export async function deleteStaff(staffId: number) {
  * @param loginParams 登录信息
  */
 export async function login(loginParams: any, ip: string) {
-    let wrongNum: any, 
-    wrongNumMemcachedKey: string = memcachedPrefix.projectPrefix + ip + memcachedPrefix.wrongNumSuffix, 
-    vcodeKey: string = memcachedPrefix.projectPrefix + ip + memcachedPrefix.verificationCodeSuffix;
+    let wrongNum: any,
+        wrongNumMemcachedKey: string = memcachedPrefix.projectPrefix + ip + memcachedPrefix.wrongNumSuffix,
+        vcodeKey: string = memcachedPrefix.projectPrefix + ip + memcachedPrefix.verificationCodeSuffix;
     wrongNum = await Memcached.get(wrongNumMemcachedKey);
     if (wrongNum >= MAX_WRONG_NUM) {
         if (!loginParams.verificationCode) {
@@ -122,24 +122,18 @@ export async function login(loginParams: any, ip: string) {
 
     let tokenValue: any = token(loginParams);
     wrongNum = 0;
-    await Memcached.set(memcachedPrefix.projectPrefix  +"staff_" + user.id + "_token", tokenValue);
+    await Memcached.set(memcachedPrefix.projectPrefix + "staff_" + user.id + "_token", tokenValue);
     await Memcached.set(wrongNumMemcachedKey, wrongNum, WRONG_NUM_TIME);
 
 
-    return { name: user.name, token: tokenValue, id: user.id, type: user.type, isChangePwd: user.isChangePwd };
+    return { name: user.name, token: tokenValue, id: user.id, isChangePwd: user.isChangePwd };
 }
 
 /**
  * 退出登录
  */
-export async function signOut(cookie: any) {
-    let userID = cookie.get(memcachedPrefix.projectPrefix  +"id");
-    await Memcached.set(memcachedPrefix.projectPrefix  + "staff_" + userID + "_token", "");
-    cookie.set(memcachedPrefix.projectPrefix  +"id", null);
-    cookie.set(memcachedPrefix.projectPrefix  +"token", null);
-    cookie.set(memcachedPrefix.projectPrefix  +"name", null);
-    cookie.set(memcachedPrefix.projectPrefix  +"type", null);
-    cookie.set(memcachedPrefix.projectPrefix  +"sysRight", null);
+export async function signOut(staffId: number) {
+    await Memcached.set(memcachedPrefix.projectPrefix + "staff_" + staffId + "_token", "");
     throw { status: 401 };
 }
 

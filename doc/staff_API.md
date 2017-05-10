@@ -19,7 +19,7 @@
 
 - **响应**
 
-  返回验证码PNG文件
+  返回验证码PNG文件（Base64格式）
 
 
 ### 1.2 用户登录   ###
@@ -47,8 +47,6 @@
  id | int | M |  id
  name | string | M |  用户名
  token | string | M | token
- sysRight | int | M |  用户拥有的权限
- type | int | M |  类型（1:系统管理员，2:其他管理员）
  isChangePwd | int | M |  是否已经修改过密码（0:未曾修改过，需强制修改；1:已经修改过，无需强制修改）
 
 
@@ -61,6 +59,12 @@
 - **接口说明**  
 
   退出系统，清除用户token。
+
+- **body请求**
+
+ 参数名 | 类型 | 必须 | 描述
+ :-----|:----:|:---:|:--------
+ id | int | M | id
 
 - **响应header**
 
@@ -81,6 +85,7 @@
 
  参数名 | 类型 | 必须 | 描述
  :-----|:----:|:---:|:--------
+ id | int | M | 用户ＩＤ
  oldPwd | string | M | 旧密码
  newPwd | string | M | 新密码
 
@@ -147,7 +152,6 @@
  sex | int | M | 性别（1：男，0: 女）
  contactTel | int | M |  联系电话
  email | string | M |  email
- type | int | M |  类型（1:系统管理员，2:其他管理员）
  isvalid | int | M |  是否启用
 
 ### 1.7 删除用户信息   ###
@@ -196,7 +200,6 @@
   sex | int | M | 性别（1：男，0: 女）
   contactTel | int | M |  联系电话
   email | string | M |  email
-  type | int | M |  类型（1:系统管理员，2:其他管理员）
   isvalid | int | M |  是否启用（0:否，1:是）
 
 
@@ -227,7 +230,7 @@
 
 - **url**  
 
-   > `post`  /staff/token
+   > `post`  /staff/verification
 
 - **接口说明**  
 
