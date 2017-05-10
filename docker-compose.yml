@@ -1,16 +1,16 @@
 version: '2'
 services:
   SecMonitor_server:
-   image: secmonitor_server_img
+   image: user_center_server_img
    ports:  
     - "7605:7605"
-   container_name: secmonitor_server
+   container_name: user_center_server
    external_links:
-      - secmonitor_db
+      - user_center_db
    networks:
       - default
       
 networks:
   default:
     external:
-      name: secmonitor_network
+      name: user_center_network

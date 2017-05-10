@@ -1,0 +1,6 @@
+src/node_modules
+src/bin
+npm-debug.log
+.DS_Store
+docker_db/test_sql/init.sh
+/src/logs
