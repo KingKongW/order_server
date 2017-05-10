@@ -23,10 +23,9 @@ describe("Staff.login()", () => {
         await Memcached.set("UserCenter_127.0.0.1_verificationCode", "test_staff_wangsy_token".toUpperCase(), 60 * 60 * 24 * 2);
 
         let result: any = await Staff.login({ account: "wangsy", password: utils.md5('123456'), verificationCode: "test_staff_wangsy_token" }, "127.0.0.1");
-        Chai.expect(result).to.include.keys(["id", "name", "token", "type", "isChangePwd"]);
+        Chai.expect(result).to.include.keys(["id", "name", "token", "isChangePwd"]);
         Chai.expect(result.id).to.eq(3);
-        Chai.expect(result.name).to.eq("wangsy");
-        Chai.expect(result.type).to.eq(1);
+        Chai.expect(result.name).to.eq("wangsy"); 
         Chai.expect(result.isChangePwd).to.eq(0);
         return;
     });
@@ -278,10 +277,9 @@ describe("Staff.checkToken()", () => {
         await Memcached.set("UserCenter_127.0.0.1_verificationCode", "test_staff_wangsy_token".toUpperCase(), 60 * 60 * 24 * 2);
 
         let result: any = await Staff.login({ account: "wangsy", password: utils.md5('123456'), verificationCode: "test_staff_wangsy_token" }, "127.0.0.1");
-        Chai.expect(result).to.include.keys(["id", "name", "token", "type", "isChangePwd"]);
+        Chai.expect(result).to.include.keys(["id", "name", "token", "isChangePwd"]);
         Chai.expect(result.id).to.eq(3);
-        Chai.expect(result.name).to.eq("wangsy");
-        Chai.expect(result.type).to.eq(1);
+        Chai.expect(result.name).to.eq("wangsy"); 
         Chai.expect(result.isChangePwd).to.eq(0);
         token = result.token;
         return;

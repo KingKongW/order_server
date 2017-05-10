@@ -23,10 +23,9 @@ describe("post /webclient/api/login", () => {
         let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
         let result = res.body;
         Chai.expect(res.status).to.eql(200);
-        Chai.expect(result).to.include.keys(["id", "name", "token", "type", "isChangePwd"]);
+        Chai.expect(result).to.include.keys(["id", "name", "token", "isChangePwd"]);
         Chai.expect(result.id).to.eq(3);
         Chai.expect(result.name).to.eq("wangsy");
-        Chai.expect(result.type).to.eq(1);
         Chai.expect(result.isChangePwd).to.eq(0);
         token = result.token;
         let cookiesToken: any = await Memcached.get(verificationCode);
@@ -70,10 +69,9 @@ describe("post /webclient/api/signOut", () => {
         let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
         let result = res.body;
         Chai.expect(res.status).to.eql(200);
-        Chai.expect(result).to.include.keys(["id", "name", "token", "type", "isChangePwd"]);
+        Chai.expect(result).to.include.keys(["id", "name", "token", "isChangePwd"]);
         Chai.expect(result.id).to.eq(3);
         Chai.expect(result.name).to.eq("wangsy");
-        Chai.expect(result.type).to.eq(1);
         Chai.expect(result.isChangePwd).to.eq(0);
         token = result.token;
         let cookiesToken: any = await Memcached.get(verificationCode);
@@ -110,27 +108,27 @@ describe("post /webclient/api/modifyPWD", () => {
     });
 
     let errorParams: any = [{
-        body: { id:"",oldPwd: "333", newPwd: utils.md5('123456') },
+        body: { id: "", oldPwd: "333", newPwd: utils.md5('123456') },
         errorMsg: "用户ID不能为空！",
         title: "the id is empty"
-    },{
-        body: {id:"sdfsdf", oldPwd: "", newPwd: utils.md5('123456') },
+    }, {
+        body: { id: "sdfsdf", oldPwd: "", newPwd: utils.md5('123456') },
         errorMsg: "用户ID值错误！",
         title: "the id is string"
-    },{
-        body: {id:"0", oldPwd: "", newPwd: utils.md5('123456') },
+    }, {
+        body: { id: "0", oldPwd: "", newPwd: utils.md5('123456') },
         errorMsg: "用户ID值错误！",
         title: "the id is less than 1"
-    },{
-        body: { oldPwd: "", newPwd: utils.md5('123456') },
+    }, {
+        body: { id: "999", oldPwd: "", newPwd: utils.md5('123456') },
         errorMsg: "旧密码不能为空！",
         title: "the oldPwd is empty"
     }, {
-        body: { oldPwd: utils.md5('111111'), newPwd: "" },
+        body: { id: "999", oldPwd: utils.md5('111111'), newPwd: "" },
         errorMsg: "新密码不能为空！",
         title: "the newPwd is empty"
     }, {
-        body: { oldPwd: utils.md5('111111'), newPwd: utils.md5('111111') },
+        body: { id: "999", oldPwd: utils.md5('111111'), newPwd: utils.md5('111111') },
         errorMsg: "新旧密码不能相同！",
         title: "the newPwd equals newPwd "
     }];
@@ -147,25 +145,6 @@ describe("post /webclient/api/modifyPWD", () => {
 });
 
 describe(" post /webclient/api/staff", () => {
-
-    it(" success: login", async () => {
-
-        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
-
-        let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
-        let result = res.body;
-        Chai.expect(res.status).to.eql(200);
-        Chai.expect(result).to.include.keys(["id", "name", "token", "type", "isChangePwd"]);
-        Chai.expect(result.id).to.eq(3);
-        Chai.expect(result.name).to.eq("wangsy");
-        Chai.expect(result.type).to.eq(1);
-        Chai.expect(result.isChangePwd).to.eq(0);
-        token = result.token;
-        // cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
-        let cookiesToken: any = await Memcached.get(verificationCode);
-        Chai.expect(cookiesToken).to.eq(token);
-        return;
-    });
 
 
     let random = (new Date()).getTime();
@@ -284,26 +263,6 @@ describe(" post /webclient/api/staff", () => {
 
 describe(" delete /webclient/api/staff/:id", () => {
 
-    it(" success: login", async () => {
-
-        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
-
-        let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
-        let result = res.body;
-        Chai.expect(res.status).to.eql(200);
-        Chai.expect(result).to.include.keys(["id", "name", "token", "type", "isChangePwd"]);
-        Chai.expect(result.id).to.eq(3);
-        Chai.expect(result.name).to.eq("wangsy");
-        Chai.expect(result.type).to.eq(1);
-        Chai.expect(result.isChangePwd).to.eq(0);
-        token = result.token;
-        // cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
-        let cookiesToken: any = await Memcached.get(verificationCode);
-        Chai.expect(cookiesToken).to.eq(token);
-        return;
-    });
-
-
     let random = (new Date()).getTime();
     let id: number;
     let createParam = {
@@ -362,25 +321,6 @@ describe(" delete /webclient/api/staff/:id", () => {
 
 describe(" get /webclient/api/staff/:id", () => {
 
-    it(" success: login", async () => {
-
-        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
-
-        let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
-        let result = res.body;
-        Chai.expect(res.status).to.eql(200);
-        Chai.expect(result).to.include.keys(["id", "name", "token", "type", "isChangePwd"]);
-        Chai.expect(result.id).to.eq(3);
-        Chai.expect(result.name).to.eq("wangsy");
-        Chai.expect(result.type).to.eq(1);
-        Chai.expect(result.isChangePwd).to.eq(0);
-        token = result.token;
-        // cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
-        let cookiesToken: any = await Memcached.get(verificationCode);
-        Chai.expect(cookiesToken).to.eq(token);
-        return;
-    });
-
     it(" success: get a staff info", async () => {
         let res = await request.get(prefixUrlWeb + "/staff/" + modelList[0].id).set("cookie", cookie);
         let result = res.body;
@@ -414,25 +354,6 @@ describe(" get /webclient/api/staff/:id", () => {
 
 
 describe(" post /webclient/api/staff/resetPwd", () => {
-
-    it(" success: login", async () => {
-
-        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
-
-        let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
-        let result = res.body;
-        Chai.expect(res.status).to.eql(200);
-        Chai.expect(result).to.include.keys(["id", "name", "token", "type", "isChangePwd"]);
-        Chai.expect(result.id).to.eq(3);
-        Chai.expect(result.name).to.eq("wangsy");
-        Chai.expect(result.type).to.eq(1);
-        Chai.expect(result.isChangePwd).to.eq(0);
-        token = result.token;
-        // cookie = "auth_name=" + result.name + "; auth_token=" + result.token + "; auth_id=" + result.id + "; auth_loginName=" + result.loginName + ";";
-        let cookiesToken: any = await Memcached.get(verificationCode);
-        Chai.expect(cookiesToken).to.eq(token);
-        return;
-    });
 
     it(" success: resetPwd", async () => {
         let res = await request.post(prefixUrlWeb + "/staff/resetPwd").set("cookie", cookie).send({ id: modelList[0].id, password: utils.md5("111111") });
