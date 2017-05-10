@@ -93,32 +93,10 @@ describe("post /webclient/api/signOut", () => {
 
 describe("post /webclient/api/modifyPWD", () => {
 
-    it(" success: login", async () => {
-
-        await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
-
-        let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
-        let result = res.body;
-        Chai.expect(res.status).to.eql(200);
-        Chai.expect(result).to.include.keys(["id", "name", "token", "type", "isChangePwd"]);
-        Chai.expect(result.id).to.eq(3);
-        Chai.expect(result.name).to.eq("wangsy");
-        Chai.expect(result.type).to.eq(1);
-        Chai.expect(result.isChangePwd).to.eq(0);
-        token = result.token;
-        cookie = memcachedPrefix.projectPrefix + "name=" + result.name + ";"
-            + memcachedPrefix.projectPrefix + "token=" + result.token + "; "
-            + memcachedPrefix.projectPrefix + "id=" + result.id + "; "
-            + memcachedPrefix.projectPrefix + "loginName=" + result.loginName + ";";
-        let cookiesToken: any = await Memcached.get(verificationCode);
-        Chai.expect(cookiesToken).to.eq(token);
-        return;
-    });
-
     it(" success: modifyPWD", async () => {
         let res: any = await request.post(prefixUrlWeb + "/modifyPWD")
             .set("cookie", cookie)
-            .send({ oldPwd: utils.md5('123456'), newPwd: utils.md5('111111') });
+            .send({ id: modelList[0].id, oldPwd: utils.md5('111111'), newPwd: utils.md5('123456') });
         Chai.expect(res.status).to.eql(200);
         return;
     });
@@ -126,12 +104,24 @@ describe("post /webclient/api/modifyPWD", () => {
     it(" success: modifyPWD", async () => {
         let res: any = await request.post(prefixUrlWeb + "/modifyPWD")
             .set("cookie", cookie)
-            .send({ oldPwd: utils.md5('111111'), newPwd: utils.md5('123456') });
+            .send({ id: modelList[0].id, oldPwd: utils.md5('123456'), newPwd: utils.md5('111111') });
         Chai.expect(res.status).to.eql(200);
         return;
     });
 
     let errorParams: any = [{
+        body: { id:"",oldPwd: "333", newPwd: utils.md5('123456') },
+        errorMsg: "用户ID不能为空！",
+        title: "the id is empty"
+    },{
+        body: {id:"sdfsdf", oldPwd: "", newPwd: utils.md5('123456') },
+        errorMsg: "用户ID值错误！",
+        title: "the id is string"
+    },{
+        body: {id:"0", oldPwd: "", newPwd: utils.md5('123456') },
+        errorMsg: "用户ID值错误！",
+        title: "the id is less than 1"
+    },{
         body: { oldPwd: "", newPwd: utils.md5('123456') },
         errorMsg: "旧密码不能为空！",
         title: "the oldPwd is empty"

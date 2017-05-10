@@ -42,7 +42,6 @@ export async function saveStaff(staffParams: any) {
             sex: staffParams.sex,
             contactTel: staffParams.contactTel,
             email: staffParams.email,
-            type: (staffParams.loginName === "admin") ? 1 : 2,
             isvalid: staffParams.isvalid,
             isChangePwd: 0
         };
@@ -126,7 +125,7 @@ export async function login(loginParams: any, ip: string) {
     await Memcached.set(wrongNumMemcachedKey, wrongNum, WRONG_NUM_TIME);
 
 
-    return { name: user.name, token: tokenValue, id: user.id, type: user.type, isChangePwd: user.isChangePwd };
+    return { name: user.name, token: tokenValue, id: user.id, isChangePwd: user.isChangePwd };
 }
 
 /**
@@ -138,7 +137,6 @@ export async function signOut(cookie: any) {
     cookie.set(memcachedPrefix.projectPrefix  +"id", null);
     cookie.set(memcachedPrefix.projectPrefix  +"token", null);
     cookie.set(memcachedPrefix.projectPrefix  +"name", null);
-    cookie.set(memcachedPrefix.projectPrefix  +"type", null);
     cookie.set(memcachedPrefix.projectPrefix  +"sysRight", null);
     throw { status: 401 };
 }
