@@ -135,10 +135,6 @@ export async function login(loginParams: any, ip: string) {
 export async function signOut(cookie: any) {
     let userID = cookie.get(memcachedPrefix.projectPrefix + "id");
     await Memcached.set(memcachedPrefix.projectPrefix + "staff_" + userID + "_token", "");
-    cookie.set(memcachedPrefix.projectPrefix + "id", null);
-    cookie.set(memcachedPrefix.projectPrefix + "token", null);
-    cookie.set(memcachedPrefix.projectPrefix + "name", null);
-    cookie.set(memcachedPrefix.projectPrefix + "sysRight", null);
     throw { status: 401 };
 }
 
