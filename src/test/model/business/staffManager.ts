@@ -22,7 +22,7 @@ describe("Staff.login()", () => {
         //设置验证码
         await Memcached.set("UserCenter_127.0.0.1_verificationCode", "test_staff_wangsy_token".toUpperCase(), 60 * 60 * 24 * 2);
 
-        let result: any = await Staff.login({ account: "wangsy", password: utils.md5('123456'), verificationCode: "test_staff_wangsy_token" }, "127.0.0.1");
+        let result: any = await Staff.login({ account: "wangsy", password: utils.md5('123456'), verificationCode: "test_staff_wangsy_token",ip:"127.0.0.1" });
         Chai.expect(result).to.include.keys(["id", "name", "token", "isChangePwd"]);
         Chai.expect(result.id).to.eq(3);
         Chai.expect(result.name).to.eq("wangsy"); 
@@ -30,11 +30,11 @@ describe("Staff.login()", () => {
         return;
     });
     let errorParams: any = [{
-        body: { account: "abcd", password: "6c7268e9149bde37fd036ebf464b1545" },
+        body: { account: "abcd", password: "6c7268e9149bde37fd036ebf464b1545" ,ip:"127.0.0.1"},
         errorMsg: "用户名、密码不正确！",
         title: "the loginName is wrong"
     }, {
-        body: { account: "wangsy", password: "abcddddddd" },
+        body: { account: "wangsy", password: "abcddddddd" ,ip:"127.0.0.1"},
         errorMsg: "用户名、密码不正确！",
         title: "the password is wrong"
     }];
@@ -42,7 +42,7 @@ describe("Staff.login()", () => {
     for (let errorParam of errorParams) {
         it(" failed:  " + errorParam.title, async () => {
             try {
-                await Staff.login(errorParam.body, "127.0.0.1");
+                await Staff.login(errorParam.body);
             } catch (error) {
                 Chai.expect(error.status).to.eql(403);
                 Chai.expect(error.errorMsg).to.eql(errorParam.errorMsg);
@@ -276,7 +276,7 @@ describe("Staff.checkToken()", () => {
         //设置验证码
         await Memcached.set("UserCenter_127.0.0.1_verificationCode", "test_staff_wangsy_token".toUpperCase(), 60 * 60 * 24 * 2);
 
-        let result: any = await Staff.login({ account: "wangsy", password: utils.md5('123456'), verificationCode: "test_staff_wangsy_token" }, "127.0.0.1");
+        let result: any = await Staff.login({ account: "wangsy", password: utils.md5('123456'), verificationCode: "test_staff_wangsy_token" ,ip: "127.0.0.1"});
         Chai.expect(result).to.include.keys(["id", "name", "token", "isChangePwd"]);
         Chai.expect(result.id).to.eq(3);
         Chai.expect(result.name).to.eq("wangsy"); 

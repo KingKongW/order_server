@@ -74,8 +74,9 @@ async function getVerificationCode() {
 async function login() {
   this.checkBody("account").notEmpty("登录名不能为空！");
   this.checkBody("password").notEmpty("登录密码不能为空！");
+  this.checkBody("ip").notEmpty("ip不能为空！");
   utils.throwValidatorError(this.errors);
-  this.body = await staff.login(this.request.body, this.request.ip);
+  this.body = await staff.login(this.request.body);
 }
 
 /**
