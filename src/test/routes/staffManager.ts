@@ -14,6 +14,27 @@ let modelList: any = [
     { "id": 2, "loginName": "tianjy", "name": "tianjy", "sex": 1, "contactTel": "s", "email": "e@12.com", "isvalid": 1 },
     { "id": 3, "loginName": "wangsy", "name": "wangsy", "sex": 1, "contactTel": "f", "email": "e", "isvalid": 1 }];
 
+describe("post /webclient/api/verificationCode", () => {
+    it(" success: verificationCode", async () => {
+        let res: any = await request.post(prefixUrlWeb + "/verificationCode").send({ ip: "127.0.0.1" });
+        return;
+    });
+
+     let errorParams: any = [ {
+        body: {ip:"" },
+        errorMsg: "ip不能为空！",
+        title: "the ip is empty"
+    }];
+    for (let errorParam of errorParams) {
+        it(" failed:  " + errorParam.title, async () => {
+            let res = await request.post(prefixUrlWeb + "/verificationCode").send(errorParam.body);
+            let result = res.body;
+            Chai.expect(res.status).to.eql(403);
+            Chai.expect(res.body.errorMsg).to.eql(errorParam.errorMsg);
+        });
+    }
+});
+
 
 describe("post /webclient/api/login", () => {
     it(" success: login", async () => {
@@ -71,7 +92,7 @@ describe("post /webclient/api/signOut", () => {
 
         await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
 
-        let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode,ip:"127.0.0.1" });
+        let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode, ip: "127.0.0.1" });
         let result = res.body;
         Chai.expect(res.status).to.eql(200);
         Chai.expect(result).to.include.keys(["id", "name", "token", "isChangePwd"]);

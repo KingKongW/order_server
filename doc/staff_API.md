@@ -11,11 +11,17 @@
 
 - **url**  
 
-   > `get`  /verificationCode
+   > `post`  /verificationCode
 
 - **接口说明**  
 
   获取验证码
+
+- **body请求**
+
+ 参数名 | 类型 | 必须 | 描述
+ :-----|:----:|:---:|:--------
+ ip | string | M | 客户端访问地址
 
 - **响应**
 
@@ -39,6 +45,7 @@
  :-----|:----:|:---:|:--------
  account | string | M | 登录名
  password | string | M | 密码
+ ip | string | M | 客户端访问地址
 
 - **响应对象**
 
