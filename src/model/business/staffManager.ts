@@ -95,10 +95,10 @@ export async function deleteStaff(staffId: number) {
  * 登录
  * @param loginParams 登录信息
  */
-export async function login(loginParams: any, ip: string) {
+export async function login(loginParams: any) {
     let wrongNum: any,
-        wrongNumMemcachedKey: string = memcachedPrefix.projectPrefix + ip + memcachedPrefix.wrongNumSuffix,
-        vcodeKey: string = memcachedPrefix.projectPrefix + ip + memcachedPrefix.verificationCodeSuffix;
+        wrongNumMemcachedKey: string = memcachedPrefix.projectPrefix + loginParams.ip + memcachedPrefix.wrongNumSuffix,
+        vcodeKey: string = memcachedPrefix.projectPrefix + loginParams.ip + memcachedPrefix.verificationCodeSuffix;
     wrongNum = await Memcached.get(wrongNumMemcachedKey);
     if (wrongNum >= MAX_WRONG_NUM) {
         if (!loginParams.verificationCode) {

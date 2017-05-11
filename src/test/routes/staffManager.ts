@@ -20,7 +20,7 @@ describe("post /webclient/api/login", () => {
 
         await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
 
-        let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
+        let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode, ip: "127.0.0.1" });
         let result = res.body;
         Chai.expect(res.status).to.eql(200);
         Chai.expect(result).to.include.keys(["id", "name", "token", "isChangePwd"]);
@@ -34,19 +34,23 @@ describe("post /webclient/api/login", () => {
     });
 
     let errorParams: any = [{
-        body: { password: "6c7268e9149bde37fd036ebf464b1545", verificationCode: verificationCode },
+        body: { password: "6c7268e9149bde37fd036ebf464b1545", verificationCode: verificationCode, ip: "127.0.0.1" },
         errorMsg: "登录名不能为空！",
         title: "the loginName is empty"
     }, {
-        body: { account: "wangsy", verificationCode: verificationCode },
+        body: { account: "wangsy", verificationCode: verificationCode, ip: "127.0.0.1" },
         errorMsg: "登录密码不能为空！",
         title: "the password is empty"
     }, {
-        body: { account: "abcd", password: "6c7268e9149bde37fd036ebf464b1545", verificationCode: verificationCode },
+        body: { account: "wangsy", password: "6c7268e9149bde37fd036ebf464b1545", verificationCode: verificationCode },
+        errorMsg: "ip不能为空！",
+        title: "the ip is empty"
+    }, {
+        body: { account: "abcd", password: "6c7268e9149bde37fd036ebf464b1545", verificationCode: verificationCode, ip: "127.0.0.1" },
         errorMsg: "用户名、密码不正确！",
         title: "the loginName is wrong"
     }, {
-        body: { account: "wangsy", password: "abcddddddd", verificationCode: verificationCode },
+        body: { account: "wangsy", password: "abcddddddd", verificationCode: verificationCode, ip: "127.0.0.1" },
         errorMsg: "用户名、密码不正确！",
         title: "the password is wrong"
     }];
@@ -67,7 +71,7 @@ describe("post /webclient/api/signOut", () => {
 
         await Memcached.set("UserCenter_::ffff:127.0.0.1_verificationCode", verificationCode.toUpperCase(), 60 * 60 * 24 * 2);
 
-        let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode });
+        let res: any = await request.post(prefixUrlWeb + "/login").send({ account: "wangsy", password: utils.md5('123456'), verificationCode: verificationCode,ip:"127.0.0.1" });
         let result = res.body;
         Chai.expect(res.status).to.eql(200);
         Chai.expect(result).to.include.keys(["id", "name", "token", "isChangePwd"]);
@@ -81,7 +85,7 @@ describe("post /webclient/api/signOut", () => {
         return;
     });
 
-     let errorParams: any = [{
+    let errorParams: any = [{
         body: { id: "" },
         errorMsg: "用户ID不能为空！",
         title: "the id is empty"
