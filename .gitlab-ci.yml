@@ -1,0 +1,130 @@
+stages:
+  - clean_history_cached
+  - preconditions
+  - build
+  - unit_test
+  - after_test
+  - execution
+  - aliyun
+  - clean
+  - push_aliyun
+
+clean_user_center_server:
+  only: 
+    - branches
+  except:
+    - /test[0-9\.\-]*/
+  stage: clean_history_cached
+  script:
+    - docker stop user_center_server && docker rm user_center_server
+  allow_failure: true
+
+clean_user_center_db:
+  only: 
+    - branches
+  except:
+    - /test[0-9\.\-]*/
+  stage: clean_history_cached
+  script:
+    - docker stop user_center_db&& docker rm user_center_db
+  allow_failure: true
+
+clean_ota_memcached:
+  only: 
+    - branches
+  except:
+    - /test[0-9\.\-]*/
+  stage: clean_history_cached
+  script:
+    - docker stop ota_memcached && docker rm ota_memcached
+  allow_failure: true
+
+create_ota_network:
+  only: 
+    - branches
+  except:
+    - /test[0-9\.\-]*/
+  stage: preconditions
+  script:
+    - docker network create ota_network
+  allow_failure: true
+
+create_docker_create_user_center_db:
+  only: 
+    - branches
+  except:
+    - /test[0-9\.\-]*/
+  stage: preconditions
+  script:
+     - sh ./docker_db/create_db.sh
+     - sleep 20
+
+build:
+  only: 
+    - branches
+  except:
+    - /test[0-9\.\-]*/
+  stage: build
+  script:
+    - docker build -t user_center_server_img . 
+
+create_memcached:
+  only: 
+    - branches
+  except:
+    - /test[0-9\.\-]*/
+  stage: after_test
+  script:
+    - docker run -d --restart=always --name ota_memcached --network ota_network memcached
+
+unit_test:
+  only: 
+    - branches
+  except:
+    - /test[0-9\.\-]*/
+  stage: unit_test
+  script:
+    - docker run --network ota_network --link user_center_db:user_center_db --link ota_memcached:ota_memcached --rm user_center_server_img "mocha" "bin/test/index.js"
+    
+run_container:
+  only: 
+    - branches
+  except:
+    - /test[0-9\.\-]*/
+  stage: execution
+  script:
+    - docker run -d --restart=always --name user_center_server --network ota_network --link user_center_db:user_center_db --link ota_memcached:ota_memcached user_center_server_img
+
+clean_image:
+  only: 
+    - branches
+  except:
+    - /test[0-9\.\-]*/
+  stage: clean
+  script:
+    - docker rmi $(docker images | grep "^<none>" | awk "{print $3}")  
+  allow_failure: true
+
+clean_volume:
+  only: 
+    - branches
+  except:
+    - /test[0-9\.\-]*/
+  stage: clean
+  script:
+    - docker volume rm $(docker volume ls -qf dangling=true)
+  allow_failure: true
+
+push_aliyun:
+  stage: push_aliyun
+  only: 
+    - /test[0-9\.\-]*/
+  except:
+    - branches
+  script:
+    - sh ./docker_db/create_db_img.sh
+    - docker login -u="yangp@polyvi.com" -p="polyvidockerimage2017" registry.cn-hangzhou.aliyuncs.com
+    - docker tag user_center_server_img registry.cn-hangzhou.aliyuncs.com/polyvi/user_centerserver_img:$CI_COMMIT_TAG 
+    - docker push registry.cn-hangzhou.aliyuncs.com/polyvi/user_centerserver_img$CI_COMMIT_TAG 
+    - docker tag user_center_server_img registry.cn-hangzhou.aliyuncs.com/polyvi/user_center_db_img:$CI_COMMIT_TAG 
+    - docker push registry.cn-hangzhou.aliyuncs.com/polyvi/user_center_db_img$CI_COMMIT_TAG 

@@ -1,0 +1,1 @@
+docker build -f DBDockerfile -t user_center_db_img .

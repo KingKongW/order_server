@@ -1,0 +1,11 @@
+# This is a dockfile for user_center_db_img
+FROM  mysql
+
+RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+ENV MYSQL_DATABASE "user_center"
+ENV MYSQL_ROOT_PASSWORD "123"
+ENV TZ "Asia/Shanghai"
+
+COPY ./docker_db/test_sql /docker-entrypoint-initdb.d
+
+EXPOSE 3306
