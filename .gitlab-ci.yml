@@ -2,7 +2,7 @@ stages:
   - clean_history_cached
   - preconditions
   - build
-  - unit_test
+  # - unit_test
   - after_test
   - execution
   - aliyun
@@ -77,14 +77,14 @@ create_memcached:
   script:
     - docker run -d --restart=always --name ota_memcached --network ota_network memcached
 
-unit_test:
-  only: 
-    - branches
-  except:
-    - /test[0-9\.\-]*/
-  stage: unit_test
-  script:
-    - docker run --network ota_network --link user_center_db:user_center_db --link ota_memcached:ota_memcached --rm user_center_server_img "mocha" "bin/test/index.js"
+# unit_test:
+#   only: 
+#     - branches
+#   except:
+#     - /test[0-9\.\-]*/
+#   stage: unit_test
+#   script:
+#     - docker run --network ota_network --link user_center_db:user_center_db --link ota_memcached:ota_memcached --rm user_center_server_img "mocha" "bin/test/index.js"
     
 run_container:
   only: 
