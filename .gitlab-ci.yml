@@ -93,11 +93,11 @@ run_container:
     - /test[0-9\.\-]*/
   stage: execution
   script:
-    - docker run -d --restart=always --name user_center_server --network ota_network --link user_center_db:user_center_db --link ota_memcached:ota_memcached user_center_server_img
+    - docker run -d -p 252:7202 --restart=always --name user_center_server --network ota_network --link user_center_db:user_center_db --link ota_memcached:ota_memcached user_center_server_img
 
 clean_image:
   only: 
-    - branches
+    - clean
   except:
     - /test[0-9\.\-]*/
   stage: clean
@@ -107,7 +107,7 @@ clean_image:
 
 clean_volume:
   only: 
-    - branches
+    - clean
   except:
     - /test[0-9\.\-]*/
   stage: clean
