@@ -7,7 +7,7 @@ import * as errorMsg from "../config/error_msg";
 
 export = function (router: router) {
   router.post("/webclient/api/login", login);
-  router.get("/webclient/api/verificationCode", getVerificationCode);
+  router.post("/webclient/api/verificationCode", getVerificationCode);
   router.post("/webclient/api/signOut", signOut);
   router.post("/webclient/api/modifyPWD", modifyPWD);
   router.post("/webclient/api/staff", saveStaff);
@@ -24,11 +24,17 @@ export = function (router: router) {
 
 - **url**  
 
-   > `get`  /verificationCode
+   > `post`  /verificationCode
 
 - **接口说明**  
 
   获取验证码
+
+  - **body请求**
+
+ 参数名 | 类型 | 必须 | 描述
+ :-----|:----:|:---:|:--------
+ ip | string | M | 客户端访问地址
 
 - **响应**
 
@@ -36,7 +42,9 @@ export = function (router: router) {
  */
 async function getVerificationCode() {
   this.set("Content-Type", "image/png");
-  this.body = await staff.getVerificationCode(this.request.ip);
+  this.checkBody("ip").notEmpty("ip不能为空！");
+  utils.throwValidatorError(this.errors);
+  this.body = await staff.getVerificationCode(this.request.body.ip);
 }
 
 
