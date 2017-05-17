@@ -100,14 +100,15 @@ export async function login(loginParams: any) {
         wrongNumMemcachedKey: string = memcachedPrefix.projectPrefix + loginParams.ip + memcachedPrefix.wrongNumSuffix,
         vcodeKey: string = memcachedPrefix.projectPrefix + loginParams.ip + memcachedPrefix.verificationCodeSuffix;
     wrongNum = await Memcached.get(wrongNumMemcachedKey);
-    if (wrongNum >= MAX_WRONG_NUM) {
-        if (!loginParams.verificationCode) {
-            throw { status: 403, errorMsg: "验证码不可为空！", wrongNum: wrongNum };
-        } else {
-            let vCode = await Memcached.get(vcodeKey);
-            if (loginParams.verificationCode.toUpperCase() !== vCode) throw { status: 403, errorMsg: "验证码不正确！", wrongNum: wrongNum };
-        }
-    }
+    // todo  暂时去掉验证码，
+    // if (wrongNum >= MAX_WRONG_NUM) {
+    //     if (!loginParams.verificationCode) {
+    //         throw { status: 403, errorMsg: "验证码不可为空！", wrongNum: wrongNum };
+    //     } else {
+    //         let vCode = await Memcached.get(vcodeKey);
+    //         if (loginParams.verificationCode.toUpperCase() !== vCode) throw { status: 403, errorMsg: "验证码不正确！", wrongNum: wrongNum };
+    //     }
+    // }
     let user: any = await db.Staff.findOne(<Sequelize.WhereOptions>{
         where: {
             loginName: loginParams.account,
