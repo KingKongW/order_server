@@ -6,6 +6,6 @@ ENV MYSQL_DATABASE "user_center"
 ENV MYSQL_ROOT_PASSWORD "123"
 ENV TZ "Asia/Shanghai"
 
-COPY ./docker_db/test_sql /docker-entrypoint-initdb.d
+COPY ./docker_db/sql /docker-entrypoint-initdb.d
 
 EXPOSE 3306
