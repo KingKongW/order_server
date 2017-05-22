@@ -54,6 +54,7 @@
  id | int | M |  id
  name | string | M |  用户名
  token | string | M | token
+ type | int | M |  类型（1:系统管理员，2:其他管理员）
  isChangePwd | int | M |  是否已经修改过密码（0:未曾修改过，需强制修改；1:已经修改过，无需强制修改）
 
 
