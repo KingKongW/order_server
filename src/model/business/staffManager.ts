@@ -126,7 +126,7 @@ export async function login(loginParams: any) {
     await Memcached.set(wrongNumMemcachedKey, wrongNum, WRONG_NUM_TIME);
 
 
-    return { name: user.name, token: tokenValue, id: user.id, isChangePwd: user.isChangePwd };
+    return { name: user.name, token: tokenValue, id: user.id, isChangePwd: user.isChangePwd, type: user.type };
 }
 
 /**
@@ -204,7 +204,7 @@ export async function checkToken(id: number, tokenValue: string) {
 
     let _token = await Memcached.get(memcachedPrefix.projectPrefix + "staff_" + staff.id + "_token");
     if (_.isEmpty(_token)) throw errorMsg.tokenHasGone();
-    else if (_token !== tokenValue) throw errorMsg.isWrong("token");
+    else if (_token !== tokenValue) throw { status: 401, errorMsg: "token不正确！" };
 
     return {};
 }

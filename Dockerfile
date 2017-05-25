@@ -14,7 +14,7 @@ RUN npm install mocha -g
 RUN npm install node-gyp -g
 RUN npm install
 # for mac  
-# RUN npm rebuild
+RUN npm rebuild
 
 EXPOSE 7202
 

@@ -48,7 +48,7 @@ export function isEmpty(elementName: string) {
 
 export function tokenHasGone() {
     return {
-        status: 403,
+        status: 401,
         errorMsg: "登录已过期，请重新登录！"
     };
 }

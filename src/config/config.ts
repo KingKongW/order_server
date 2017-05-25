@@ -11,9 +11,7 @@ export const server: any = {
     db: {
         pwd: "123",
         user: "root",
-        // url: "user_center_db",
-        url: "127.0.0.1",
-        port: 7204,
+        url: "user_center_db",
         name: "user_center",
         maxConnections: 2, // 最大连接
         minConnections: 1,  // 最小连接
@@ -22,8 +20,7 @@ export const server: any = {
 };
 
 export const cachedConfig = {
-    // host: "secmonitor_memcached:11211",
-    host: "localhost:11211",
+    host: "ota_memcached:11211",
     lifetime: 60 * 30 // 单位秒
 };
 
