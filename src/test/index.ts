@@ -15,3 +15,5 @@ require("./routes");
  */
 
 require("./model/business");
+
+require("./utils");

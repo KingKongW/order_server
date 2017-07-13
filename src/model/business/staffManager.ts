@@ -3,7 +3,7 @@ import * as db from "../../model/dao/db";
 
 import * as moment from "moment";
 import * as _ from "lodash";
-import { md5, token } from "../../utils/crypto";
+import { md5, token, desDecrypt } from "../../utils/crypto";
 import * as Sequelize from "sequelize";
 import * as Memcached from "../../utils/memcached";
 import { memcachedPrefix, MAX_WRONG_NUM, WRONG_NUM_TIME, VERIFICATION_CODE_TIME } from "../../config/config";
@@ -201,10 +201,11 @@ export async function checkToken(id: number, tokenValue: string) {
     let staff: any = await db.Staff.findById(id);
     if (_.isEmpty(staff)) throw errorMsg.objectNotExsitFn("用户");
 
-
+    tokenValue = desDecrypt(tokenValue, id.toString());
+    let tokenObj = JSON.parse(tokenValue);
     let _token = await Memcached.get(memcachedPrefix.projectPrefix + "staff_" + staff.id + "_token");
     if (_.isEmpty(_token)) throw errorMsg.tokenHasGone();
-    else if (_token !== tokenValue) throw { status: 401, errorMsg: "token不正确！" };
+    else if (_token !== tokenObj.token) throw { status: 401, errorMsg: "token不正确！" };
 
     return {};
 }
