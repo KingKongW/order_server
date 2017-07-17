@@ -33,9 +33,9 @@ export function token_promise(val: any) {
 /**
  * DES 解密
  */
-export function desDecrypt(text: string, key: string) {
+export async function desDecrypt(text: string, key: string) {
     key = key.length >= 16 ? key.slice(0, 16) : [key].concat("0".repeat(16 - key.length)).join("");
-    let bytes = CryptoJS.TripleDES.decrypt(text.toString(), key);
+    let bytes = await CryptoJS.TripleDES.decrypt(text.toString(), key);
     let decrypted = bytes.toString(CryptoJS.enc.Utf8);
     return decrypted;
 }
