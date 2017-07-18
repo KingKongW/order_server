@@ -17,7 +17,7 @@ import { memcachedPrefix, MAX_WRONG_NUM, WRONG_NUM_TIME, VERIFICATION_CODE_TIME 
 export async function getList(pageIndex: number, pageSize: number, keywords: string) {
     let whereParams: any = [{ loginName: { $ne: "admin" } }];
     if (keywords) whereParams.push({ $or: [{ loginName: { $like: "%" + keywords + "%" } }, { name: { $like: "%" + keywords + "%" } }] });
-    let list = await db.Staff.findByPage(<Sequelize.WhereOptions>{
+    let list = await db.Staff.findByPage(<Sequelize.AnyWhereOptions>{
         attributes: ["id", "loginName", "name", "sex", "contactTel", "email", "isvalid"],
         where: whereParams,
     }, pageIndex, pageSize);
@@ -33,7 +33,7 @@ export async function saveStaff(staffParams: any) {
     let staff: any;
     if (!staffParams.id) {
         // 新增
-        let hasStaff = await db.Staff.findOne(<Sequelize.WhereOptions>{ where: { loginName: staffParams.loginName } });
+        let hasStaff = await db.Staff.findOne(<Sequelize.AnyWhereOptions>{ where: { loginName: staffParams.loginName } });
         if (!_.isEmpty(hasStaff)) throw errorMsg.objectExsit("登录名");
         let createParams = {
             loginName: staffParams.loginName,
@@ -51,7 +51,7 @@ export async function saveStaff(staffParams: any) {
     } else {
         // 编辑
         if (staffParams.password) delete staffParams.password;
-        staff = await db.Staff.findOne(<Sequelize.WhereOptions>{ where: { id: staffParams.id } });
+        staff = await db.Staff.findOne(<Sequelize.AnyWhereOptions>{ where: { id: staffParams.id } });
         if (_.isEmpty(staff)) throw errorMsg.objectNotExsitFn("用户");
         if (staffParams.loginName !== staff.loginName) throw errorMsg.canNotChange("登录名");
 
@@ -108,7 +108,7 @@ export async function login(loginParams: any) {
             if (loginParams.verificationCode.toUpperCase() !== vCode) throw { status: 403, errorMsg: "验证码不正确！", wrongNum: wrongNum };
         }
     }
-    let user: any = await db.Staff.findOne(<Sequelize.WhereOptions>{
+    let user: any = await db.Staff.findOne(<Sequelize.AnyWhereOptions>{
         where: {
             loginName: loginParams.account,
             password: md5(loginParams.account + loginParams.password)
@@ -201,11 +201,14 @@ export async function checkToken(id: number, tokenValue: string) {
     let staff: any = await db.Staff.findById(id);
     if (_.isEmpty(staff)) throw errorMsg.objectNotExsitFn("用户");
 
-    tokenValue = desDecrypt(tokenValue, id.toString());
+    tokenValue = await desDecrypt(tokenValue, id.toString());
     let tokenObj = JSON.parse(tokenValue);
+    let startTime = moment(tokenObj.startTime);
+    let endTime = moment(tokenObj.endTime);
+    let now = moment();
     let _token = await Memcached.get(memcachedPrefix.projectPrefix + "staff_" + staff.id + "_token");
     if (_.isEmpty(_token)) throw errorMsg.tokenHasGone();
-    else if (_token !== tokenObj.token) throw { status: 401, errorMsg: "token不正确！" };
+    else if (_token !== tokenObj.token || endTime.diff(startTime, "seconds") !== 20 || !now.isBefore(endTime) || !now.isAfter(startTime)) throw { status: 401, errorMsg: "token不正确！" };
 
     return {};
 }
