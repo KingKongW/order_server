@@ -1,12 +1,11 @@
 import Sequelize = require("sequelize");
 import * as config from "../../config/config";
- 
 export import StaffModel = require("./staff");
 
 
 
 // Add any other models here
- 
+
 export let Staff: StaffModel.StaffInterface;
 
 
@@ -44,7 +43,7 @@ export function toConnect(): any {
                     let page: page = { pageIndex: index, pageSize: size, totalCount: 0, pageTotal: 0, data: {} };
 
                     if (page.pageSize > 0 && index > 0) {
-                        options.limit =  page.pageSize;
+                        options.limit = page.pageSize;
                         options.offset = (page.pageIndex - 1) * page.pageSize;
                     }
 
@@ -73,7 +72,7 @@ export function toConnect(): any {
 export function initialize(): void {
     let sequelize = toConnect();
 
-     
+
     Staff = <StaffModel.StaffInterface>StaffModel.define(sequelize);
 
 };
