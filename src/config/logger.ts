@@ -2,7 +2,9 @@ import * as log4js from "log4js";
 import * as config from "./config";
 import * as fs from "fs";
 
-if (!fs.existsSync(config.LOG_PATH)) fs.mkdir(config.LOG_PATH);
+if (!fs.existsSync(config.LOG_PATH)) {
+    fs.mkdirSync(config.LOG_PATH);
+}
 
 log4js.loadAppender("file");
 const localConfig: log4js.IConfig = {

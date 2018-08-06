@@ -7,7 +7,7 @@ export interface StaffInterface {
     id?: number;
     loginName?: string;
     password?: string;
-    name?: string;
+    name: string;
     sex?: number;
     contactTel?: string;
     email?: string;
