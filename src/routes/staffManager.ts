@@ -2,12 +2,9 @@ import * as router from "koa-router";
 import * as utils from "../utils/utils";
 import * as staff from "../model/business/staffManager";
 import { checkPageParams } from "../middlewares/page";
-import { memcachedPrefix } from "../config/config";
-import * as errorMsg from "../config/error_msg";
 
 export = function (router: router) {
   router.post("/webclient/api/login", login);
-  router.post("/webclient/api/verificationCode", getVerificationCode);
   router.post("/webclient/api/signOut", signOut);
   router.post("/webclient/api/modifyPWD", modifyPWD);
   router.post("/webclient/api/staff", saveStaff);
@@ -15,37 +12,8 @@ export = function (router: router) {
   router.delete("/webclient/api/staff/:id", deleteStaff);
   router.get("/webclient/api/staff/:id", getStaffInfo);
   router.post("/webclient/api/staff/resetPwd", resetPassword);
-  router.post("/webclient/api/staff/verification", checkToken);
-
 };
 
-/**
- * ### 1.1 获取验证码   ###
-
-- **url**  
-
-   > `post`  /verificationCode
-
-- **接口说明**  
-
-  获取验证码
-
-  - **body请求**
-
- 参数名 | 类型 | 必须 | 描述
- :-----|:----:|:---:|:--------
- ip | string | M | 客户端访问地址
-
-- **响应**
-
-  返回验证码PNG文件
- */
-async function getVerificationCode() {
-  this.set("Content-Type", "image/png");
-  this.checkBody("ip").notEmpty("ip不能为空！");
-  utils.throwValidatorError(this.errors);
-  this.body = await staff.getVerificationCode(this.request.body.ip);
-}
 
 
 /**
@@ -322,37 +290,5 @@ async function resetPassword() {
   this.checkBody("id").notEmpty("用户ID不能为空！").isInt("用户ID值错误！", { min: 1 });
   utils.throwValidatorError(this.errors);
   await staff.resetPassword(body.id, body.password)
-  this.body = {};
-};
-
-
-/**
- *   ### 1.10 用户token检验   ###
-
-- **url**  
-
-   > `post`  /staff/token
-
-- **接口说明**  
-
-  验证用户token是否过期，需传入token值以及用户id。
-
-- **body请求**
-
- 参数名 | 类型 | 必须 | 描述
- :-----|:----:|:---:|:--------
- id | int | M | id
- token | string | M | token值
-
-- **响应**
-
-无
- */
-async function checkToken() {
-  let body = this.request.body;
-  this.checkBody("token").notEmpty("token值不能为空！");
-  this.checkBody("id").notEmpty("用户ID不能为空！").isInt("用户ID值错误！", { min: 1 });
-  utils.throwValidatorError(this.errors);
-  await staff.checkToken(body.id, body.token)
   this.body = {};
 };

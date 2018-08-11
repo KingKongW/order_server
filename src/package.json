@@ -14,7 +14,7 @@
         "moment": "^2.10.0",
         "supertest": "^2.0.1",
         "tslint": "^3.15.1",
-        "typescript": "^2.2.2"
+        "typescript": "^3.0.1"
     },
     "dependencies": {
         "@types/bluebird": "3.0.37",
@@ -24,9 +24,7 @@
         "@types/lodash": "^4.14.54",
         "@types/log4js": "^0.0.32",
         "@types/mocha": "^2.2.39",
-        "@types/mysql": "^0.0.31",
-        "@types/sequelize": "^4.0.65",
-        "ccap": "^0.6.10",
+        "@types/sequelize": "^4.27.24",
         "chai": "^3.5.0",
         "crypto-js": "^3.1.9-1",
         "koa": "^2.0.0",
@@ -38,8 +36,9 @@
         "lodash": "^4.17.3",
         "log4js": "^0.6.38",
         "memcached": "^2.2.2",
-        "mysql": "^2.11.1",
-        "sequelize": "^3.24.4",
+        "mysql2": "",
+        "sequelize": "^4.38.0",
+        "ccap": "",
         "validator": "^7.0.0"
     }
 }

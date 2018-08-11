@@ -1,12 +1,9 @@
 import * as errorMsg from "../../config/error_msg";
 import * as db from "../../model/dao/db";
 
-import * as moment from "moment";
 import * as _ from "lodash";
-import { md5, token, desDecrypt } from "../../utils/crypto";
+import { md5 } from "../../utils/crypto";
 import * as Sequelize from "sequelize";
-import * as Memcached from "../../utils/memcached";
-import { memcachedPrefix, MAX_WRONG_NUM, WRONG_NUM_TIME, VERIFICATION_CODE_TIME } from "../../config/config";
 
 /**
  * 分页查询系统用户信息
@@ -14,11 +11,13 @@ import { memcachedPrefix, MAX_WRONG_NUM, WRONG_NUM_TIME, VERIFICATION_CODE_TIME 
  * @param pageSize
  * @param keywords 按登录名、姓名模糊查询
  */
+
+
 export async function getList(pageIndex: number, pageSize: number, keywords: string) {
     let whereParams: any = [{ loginName: { $ne: "admin" } }];
-    if (keywords) whereParams.push({ $or: [{ loginName: { $like: "%" + keywords + "%" } }, { name: { $like: "%" + keywords + "%" } }] });
+    if (keywords) whereParams.push({ $or: [{ loginName: { $like: "%" + keywords + "%" } }, { userName: { $like: "%" + keywords + "%" } }] });
     let list = await db.Staff.findByPage(<Sequelize.AnyWhereOptions>{
-        attributes: ["id", "loginName", "name", "sex", "contactTel", "email", "isvalid"],
+        attributes: ["id", "loginName", "userName", "sex", "contactTel", "email", "isvalid"],
         where: whereParams,
     }, pageIndex, pageSize);
 
@@ -38,7 +37,7 @@ export async function saveStaff(staffParams: any) {
         let createParams = {
             loginName: staffParams.loginName,
             password: md5(staffParams.loginName + staffParams.password),
-            name: staffParams.name,
+            userName: staffParams.userName,
             sex: staffParams.sex,
             contactTel: staffParams.contactTel,
             email: staffParams.email,
@@ -70,7 +69,7 @@ export async function resetPassword(staffId: number, password: string) {
     if (_.isEmpty(staff)) throw errorMsg.objectNotExsitFn("用户");
     staff.password = md5(staff.loginName + password);
     staff.isChangePwd = 1;
-    await staff.save()
+    await staff.save();
     return staff;
 };
 
@@ -87,7 +86,7 @@ export async function deleteStaff(staffId: number) {
         },
         hooks: true
     };
-    await Memcached.del(memcachedPrefix.projectPrefix + "staff_" + staff.id + "_token");
+
     return await db.Staff.destroy(queryParams);
 };
 
@@ -96,18 +95,6 @@ export async function deleteStaff(staffId: number) {
  * @param loginParams 登录信息
  */
 export async function login(loginParams: any) {
-    let wrongNum: any,
-        wrongNumMemcachedKey: string = memcachedPrefix.projectPrefix + loginParams.ip + memcachedPrefix.wrongNumSuffix,
-        vcodeKey: string = memcachedPrefix.projectPrefix + loginParams.ip + memcachedPrefix.verificationCodeSuffix;
-    wrongNum = await Memcached.get(wrongNumMemcachedKey);
-    if (wrongNum >= MAX_WRONG_NUM) {
-        if (!loginParams.verificationCode) {
-            throw { status: 403, errorMsg: "验证码不可为空！", wrongNum: wrongNum };
-        } else {
-            let vCode = await Memcached.get(vcodeKey);
-            if (loginParams.verificationCode.toUpperCase() !== vCode) throw { status: 403, errorMsg: "验证码不正确！", wrongNum: wrongNum };
-        }
-    }
     let user: any = await db.Staff.findOne(<Sequelize.AnyWhereOptions>{
         where: {
             loginName: loginParams.account,
@@ -115,25 +102,16 @@ export async function login(loginParams: any) {
         }
     });
     if (_.isEmpty(user)) {
-        wrongNum = (!wrongNum) ? 1 : (wrongNum + 1);
-        await Memcached.set(wrongNumMemcachedKey, wrongNum, WRONG_NUM_TIME);
-        throw { status: 403, errorMsg: "用户名、密码不正确！", wrongNum: wrongNum };
+        throw { status: 403, errorMsg: "用户名、密码不正确！"};
     }
 
-    let tokenValue: any = token(loginParams);
-    wrongNum = 0;
-    await Memcached.set(memcachedPrefix.projectPrefix + "staff_" + user.id + "_token", tokenValue);
-    await Memcached.set(wrongNumMemcachedKey, wrongNum, WRONG_NUM_TIME);
-
-
-    return { name: user.name, token: tokenValue, id: user.id, isChangePwd: user.isChangePwd, type: user.type };
+    return { userName: user.userName, id: user.id, isChangePwd: user.isChangePwd, type: user.type };
 }
 
 /**
  * 退出登录
  */
 export async function signOut(staffId: number) {
-    await Memcached.set(memcachedPrefix.projectPrefix + "staff_" + staffId + "_token", "");
     throw { status: 401 };
 }
 
@@ -168,17 +146,6 @@ let ccap = require("ccap")({
 
     }
 });
-/**
- * 获取验证码
- * @param ip
- */
-export async function getVerificationCode(ip: string) {
-    let ary = ccap.get();
-    let txt = ary[0];
-    let buf = ary[1].toString("base64");
-    await Memcached.set(memcachedPrefix.projectPrefix + ip + memcachedPrefix.verificationCodeSuffix, txt, VERIFICATION_CODE_TIME);
-    return buf;
-}
 
 
 /**
@@ -191,25 +158,3 @@ export async function getStaffInfo(id: number) {
     delete staff.dataValues.password;
     return staff;
 }
-
-/**
- * 验证登陆token是否过期
- * @param id 用户ＩＤ
- * @param tokenValue token值
- */
-export async function checkToken(id: number, tokenValue: string) {
-    let staff: any = await db.Staff.findById(id);
-    if (_.isEmpty(staff)) throw errorMsg.objectNotExsitFn("用户");
-
-    tokenValue = await desDecrypt(tokenValue, id.toString());
-    let tokenObj = JSON.parse(tokenValue);
-    let startTime = moment(tokenObj.startTime);
-    let endTime = moment(tokenObj.endTime);
-    let now = moment();
-    let _token = await Memcached.get(memcachedPrefix.projectPrefix + "staff_" + staff.id + "_token");
-    if (_.isEmpty(_token)) throw errorMsg.tokenHasGone();
-    else if (_token !== tokenObj.token || endTime.diff(startTime, "seconds") !== 20 || !now.isBefore(endTime) || !now.isAfter(startTime)) throw { status: 401, errorMsg: "token不正确！" };
-
-    return {};
-}
-

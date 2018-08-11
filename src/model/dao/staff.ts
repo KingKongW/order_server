@@ -7,7 +7,7 @@ export interface StaffInterface {
     id?: number;
     loginName?: string;
     password?: string;
-    name: string;
+    userName?: string;
     sex?: number;
     contactTel?: string;
     email?: string;
@@ -28,7 +28,7 @@ export function define(sequelize: Sequelize.Sequelize): StaffInterface {
         "id": { type: Sequelize.INTEGER(11), primaryKey: true, autoIncrement: true }, // 工作人员ID
         "loginName": { type: Sequelize.STRING(50), allowNull: false }, // 登录名
         "password": { type: Sequelize.STRING(50), allowNull: false }, // 密码
-        "name": { type: Sequelize.STRING(50), allowNull: false }, // 姓名
+        "userName": { type: Sequelize.STRING(50), allowNull: false }, // 姓名
         "sex": { type: Sequelize.INTEGER(1), allowNull: false }, // 性别：0=男；1=女
         "contactTel": { type: Sequelize.STRING(50) }, // 联系电话
         "email": { type: Sequelize.STRING(50) }, // 电子邮件
