@@ -11,8 +11,8 @@ export const server: any = {
     db: {
         pwd: "123",
         user: "root",
-        url: "user_center_db",
-        name: "user_center",
+        url: "order_db",
+        name: "order",
         maxConnections: 2, // 最大连接
         minConnections: 1,  // 最小连接
         maxIdleTime: 30     // 连接超时

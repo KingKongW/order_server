@@ -1,13 +1,13 @@
 import Sequelize = require("sequelize");
 import * as config from "../../config/config";
 export import StaffModel = require("./staff");
-
+export import OrderModel = require("./order");
 
 
 // Add any other models here
 
 export let Staff: StaffModel.StaffInterface;
-
+export let Order: OrderModel.OrderInterface;
 
 // Add any other models here
 
@@ -74,5 +74,6 @@ export function initialize(): void {
 
 
     Staff = <StaffModel.StaffInterface>StaffModel.define(sequelize);
+    Order = <OrderModel.OrderInterface>OrderModel.define(sequelize);
 
 };
