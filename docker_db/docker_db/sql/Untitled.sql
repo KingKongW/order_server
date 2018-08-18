@@ -113,3 +113,12 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2018-08-11 22:36:19
+
+SET GLOBAL event_scheduler = ON;
+CREATE EVENT `updateStatus` 
+ON SCHEDULE EVERY 1 day
+STARTS '2018-01-01 00:00:00' ON COMPLETION PRESERVE ENABLE
+
+DO
+update `order`.`order` set status = 3 
+where useTime < now() and status = 2;

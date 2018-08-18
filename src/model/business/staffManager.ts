@@ -3,7 +3,6 @@ import * as db from "../../model/dao/db";
 
 import * as _ from "lodash";
 import { md5 } from "../../utils/crypto";
-import * as Sequelize from "sequelize";
 
 /**
  * 分页查询系统用户信息
@@ -16,7 +15,7 @@ import * as Sequelize from "sequelize";
 export async function getList(pageIndex: number, pageSize: number, keywords: string) {
     let whereParams: any = [{ loginName: { $ne: "admin" } }];
     if (keywords) whereParams.push({ $or: [{ loginName: { $like: "%" + keywords + "%" } }, { userName: { $like: "%" + keywords + "%" } }] });
-    let list = await db.Staff.findByPage(<Sequelize.AnyWhereOptions>{
+    let list = await db.Staff.findByPage({
         attributes: ["id", "loginName", "userName", "sex", "contactTel", "email", "isvalid"],
         where: whereParams,
     }, pageIndex, pageSize);
@@ -32,7 +31,7 @@ export async function saveStaff(staffParams: any) {
     let staff: any;
     if (!staffParams.id) {
         // 新增
-        let hasStaff = await db.Staff.findOne(<Sequelize.AnyWhereOptions>{ where: { loginName: staffParams.loginName } });
+        let hasStaff = await db.Staff.findOne({ where: { loginName: staffParams.loginName } });
         if (!_.isEmpty(hasStaff)) throw errorMsg.objectExsit("登录名");
         let createParams = {
             loginName: staffParams.loginName,
@@ -50,7 +49,7 @@ export async function saveStaff(staffParams: any) {
     } else {
         // 编辑
         if (staffParams.password) delete staffParams.password;
-        staff = await db.Staff.findOne(<Sequelize.AnyWhereOptions>{ where: { id: staffParams.id } });
+        staff = await db.Staff.findOne({ where: { id: staffParams.id } });
         if (_.isEmpty(staff)) throw errorMsg.objectNotExsitFn("用户");
         if (staffParams.loginName !== staff.loginName) throw errorMsg.canNotChange("登录名");
 
@@ -95,7 +94,7 @@ export async function deleteStaff(staffId: number) {
  * @param loginParams 登录信息
  */
 export async function login(loginParams: any) {
-    let user: any = await db.Staff.findOne(<Sequelize.AnyWhereOptions>{
+    let user: any = await db.Staff.findOne({
         where: {
             loginName: loginParams.account,
             password: md5(loginParams.account + loginParams.password)

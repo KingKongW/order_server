@@ -4,6 +4,8 @@ export const PORT: number = 7202;  // 端口
 
 export const LOG_PATH: string = path.resolve(__dirname, "..", "logs/");
 
+process.env.TZ = "asia/shanghai";
+
 export const PAGE_SIZE = 20;
 
 export const server: any = {

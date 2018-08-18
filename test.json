@@ -1,0 +1,25 @@
+{ "count": 2, // 订单总数
+    "rows":
+     [  {
+         "dataValues": {
+            "maxTime": "2018-08-12T05:53:47.000Z", // 状态3的订单最大时间
+            "minTime": "2018-08-02T06:11:00.000Z",// 最小时间
+            "salesTotal": 2, // 销售总额
+            "profitTotal": 2, // 利润总额
+            "netProfitTotal": 2 // 净利润总额
+            }
+         },
+        {
+         "dataValues": {
+            "source": 1, //携程
+            "countSource": 1 //总数
+            }
+        },
+        {
+         "dataValues": {
+            "source": 2 //飞猪, 
+            "countSource": 1 //总数
+         }
+        }
+        ]
+}

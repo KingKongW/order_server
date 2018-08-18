@@ -72,8 +72,6 @@ export function toConnect(): any {
 export function initialize(): void {
     let sequelize = toConnect();
 
-
     Staff = <StaffModel.StaffInterface>StaffModel.define(sequelize);
     Order = <OrderModel.OrderInterface>OrderModel.define(sequelize);
-
 };

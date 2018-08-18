@@ -1,7 +1,4 @@
 import Sequelize = require("sequelize");
-import * as utils from "../../utils/utils";
-
-let DataTypes = require("sequelize/lib/data-types");
 
 export interface StaffInterface {
     id?: number;
@@ -17,7 +14,7 @@ export interface StaffInterface {
     isChangePwd?: number;
 }
 
-export interface Instance extends Sequelize.Instance<StaffInterface> { }
+export interface Instance extends Sequelize.Instance<StaffInterface> {}
 
 export interface StaffInterface extends Sequelize.Model<Instance, StaffInterface> {
     findByPage: (option: Object, pageIndex: number, pageSize: number) => Sequelize.Instance<Instance>;

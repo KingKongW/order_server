@@ -153,7 +153,7 @@ async function saveStaff() {
   utils.throwValidatorError(this.errors);
 
   await staff.saveStaff(body);
-  this.body = {}
+  this.body = {};
 
 }
 
@@ -289,6 +289,6 @@ async function resetPassword() {
   this.checkBody("password").notEmpty("密码不能为空！");
   this.checkBody("id").notEmpty("用户ID不能为空！").isInt("用户ID值错误！", { min: 1 });
   utils.throwValidatorError(this.errors);
-  await staff.resetPassword(body.id, body.password)
+  await staff.resetPassword(body.id, body.password);
   this.body = {};
 };

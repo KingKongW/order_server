@@ -1,16 +1,15 @@
 import Sequelize = require("sequelize");
 import * as utils from "../../utils/utils";
 
-let DataTypes = require("sequelize/lib/data-types");
-
 export interface OrderInterface {
     id?: number;
     orderNumber: string;
     status: number;
     createTime: string;
-    auditedTime?: string;
     confirmTime?: string;
+    completeTime?: string;
     cancelTime?: string;
+    useTime?: string;
     source: number;
     quantity: number;
     eleTicketQuantity: number;
@@ -46,18 +45,43 @@ export interface OrderInterface extends Sequelize.Model<Instance, OrderInterface
 }
 
 export function define(sequelize: Sequelize.Sequelize): OrderInterface {
-    let OrderModel: OrderInterface = <OrderInterface>sequelize.define<Instance, OrderInterface>("staff", {
+    let OrderModel: OrderInterface = <OrderInterface>sequelize.define<Instance, OrderInterface>("order", {
         "id": { type: Sequelize.INTEGER(11), primaryKey: true, autoIncrement: true }, // 订单主键
-        "orderName": { type: Sequelize.STRING(50), allowNull: false },
+        "orderNumber": { type: Sequelize.STRING(50), allowNull: false },
         "status": { type: Sequelize.INTEGER(1), allowNull: false },
-        "createTime": { type: Sequelize.DATE},
-        "auditedTime": { type: Sequelize.DATE},
-        "confirmTime": { type: Sequelize.DATE },
-        "cancelTime": { type: Sequelize.DATE },
+        "createTime": {
+            type: Sequelize.DATE,
+            get: function () {
+                return utils.dateFormat(this.getDataValue("createTime"), "YYYY-MM-DD HH:mm:ss");
+            }
+        },
+        "confirmTime": {
+            type: Sequelize.DATE,
+            get: function () {
+                return utils.dateFormat(this.getDataValue("confirmTime"), "YYYY-MM-DD HH:mm:ss");
+            }
+        },
+        "completeTime": {
+            type: Sequelize.DATE,
+            get: function () {
+                return utils.dateFormat(this.getDataValue("completeTime"), "YYYY-MM-DD HH:mm:ss");
+            }
+        },
+        "cancelTime": {
+            type: Sequelize.DATE,
+            get: function () {
+                return utils.dateFormat(this.getDataValue("cancelTime"), "YYYY-MM-DD HH:mm:ss");
+            }
+        },
+        "useTime": {
+            type: Sequelize.DATE, get: function () {
+                return utils.dateFormat(this.getDataValue("useTime"), "YYYY-MM-DD HH:mm:ss");
+            }
+        },
         "source": { type: Sequelize.INTEGER(11), allowNull: false },
         "quantity": { type: Sequelize.INTEGER(1), allowNull: false },
         "eleTicketQuantity": { type: Sequelize.INTEGER(11), allowNull: false },
-        "entityTickeyQuantity": { type: Sequelize.INTEGER(11), defaultValue: 0, allowNull: false },
+        "entityTicketQuantity": { type: Sequelize.INTEGER(11), defaultValue: 0, allowNull: false },
         "externalOrderNumber": { type: Sequelize.STRING(50), allowNull: false },
         "orderBelong": { type: Sequelize.STRING(50), allowNull: false },
         "orderBelong_id": { type: Sequelize.INTEGER(50), allowNull: false },
@@ -65,7 +89,12 @@ export function define(sequelize: Sequelize.Sequelize): OrderInterface {
         "goodsCode": { type: Sequelize.STRING(50) },
         "supplier": { type: Sequelize.STRING(50), allowNull: false },
         "incomingNumber": { type: Sequelize.STRING(50), allowNull: false },
-        "incomingTime": { type: Sequelize.DATE, allowNull: false },
+        "incomingTime": {
+            type: Sequelize.DATE, allowNull: false,
+            get: function () {
+                return utils.dateFormat(this.getDataValue("createTime"), "YYYY-MM-DD HH:mm:ss");
+            }
+        },
         "salesVolume": { type: Sequelize.FLOAT(11, 2), allowNull: false },
         "unitPrice": { type: Sequelize.FLOAT(11, 2), allowNull: false },
         "rmbCost": { type: Sequelize.FLOAT(11, 2), allowNull: false },
