@@ -4,14 +4,14 @@ import * as staff from "../model/business/staffManager";
 import { checkPageParams } from "../middlewares/page";
 
 export = function (router: router) {
-  router.post("/webclient/api/login", login);
-  router.post("/webclient/api/signOut", signOut);
-  router.post("/webclient/api/modifyPWD", modifyPWD);
-  router.post("/webclient/api/staff", saveStaff);
-  router.get("/webclient/api/staff", checkPageParams, getStaff);
-  router.delete("/webclient/api/staff/:id", deleteStaff);
-  router.get("/webclient/api/staff/:id", getStaffInfo);
-  router.post("/webclient/api/staff/resetPwd", resetPassword);
+  router.post("/api/login", login);
+  router.post("/api/signOut", signOut);
+  router.post("/api/modifyPWD", modifyPWD);
+  router.post("/api/staff", saveStaff);
+  router.get("/api/staff", checkPageParams, getStaff);
+  router.delete("/api/staff/:id", deleteStaff);
+  router.get("/api/staff/:id", getStaffInfo);
+  router.post("/api/staff/resetPwd", resetPassword);
 };
 
 
@@ -50,7 +50,6 @@ export = function (router: router) {
 async function login() {
   this.checkBody("account").notEmpty("登录名不能为空！");
   this.checkBody("password").notEmpty("登录密码不能为空！");
-  this.checkBody("ip").notEmpty("ip不能为空！");
   utils.throwValidatorError(this.errors);
   this.body = await staff.login(this.request.body);
 }

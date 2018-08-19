@@ -103,7 +103,6 @@ export async function login(loginParams: any) {
     if (_.isEmpty(user)) {
         throw { status: 403, errorMsg: "用户名、密码不正确！"};
     }
-
     return { userName: user.userName, id: user.id, isChangePwd: user.isChangePwd, type: user.type };
 }
 

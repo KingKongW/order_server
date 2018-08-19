@@ -3,10 +3,9 @@ import * as db from "../../model/dao/db";
 
 import * as _ from "lodash";
 import * as Sequelize from "sequelize";
-import * as moment from "moment";
 
 export async function getList(pageIndex: number, pageSize: number, query: any) {
-    let whereParams: any;
+    let whereParams: any = {};
     if (!_.isEmpty(query.orderNumber)) {
         whereParams.orderNumber = { like: "%" + query.orderNumber + "%" };
     }
@@ -19,17 +18,55 @@ export async function getList(pageIndex: number, pageSize: number, query: any) {
         whereParams.source = query.source;
     }
 
-    let list = await db.Order.findByPage({ where: whereParams, order​​: "createTime DESC" }, pageIndex, pageSize);
+    if (!_.isEmpty(query.startTime)) {
+        if (_.isEmpty(query.endTime)) {
+            query.endTime = new Date();
+        }
+        console.log(query.startTime  + "----" + query.endTime);
+        whereParams.useTime = { $between: [query.startTime, query.endTime] };
+    }
+
+    let list: any = await db.Order.findByPage({ where: whereParams, order​​: "createTime DESC" }, pageIndex, pageSize);
+
+    if (_.isEmpty(list.data)) {
+        list.errorCode = "1";
+        list.msg = "查询条件不正确！";
+    }
 
     return list;
 }
 
 export async function uploadOrder(order: any) {
-    if (!_.isEmpty(order)) {
-        order.createTime = new Date();
+    if (_.isEmpty(order)) {
+        return;
     }
     await db.Order.create(order);
     return;
+}
+
+export async function exportOrders(query: any) {
+    let whereParams: any = {};
+
+    if (!_.isEmpty(query.orderNumber)) {
+        whereParams.orderNumber = { like: "%" + query.orderNumber + "%" };
+    }
+
+    if (!_.isEmpty(query.status)) {
+        whereParams.status = query.status;
+    }
+
+    if (!_.isEmpty(query.source)) {
+        whereParams.source = query.source;
+    }
+
+    if (!_.isEmpty(query.startTime)) {
+        if (_.isEmpty(query.endTime)) {
+            query.endTime = new Date();
+        }
+        whereParams.useTime = { $between: [query.startTime, query.endTime] };
+    }
+    let list: any = await db.Order.findAll({ where: whereParams, order: "createTime DESC" });
+    return list;
 }
 
 export async function changeOrder(params: any) {
@@ -38,13 +75,12 @@ export async function changeOrder(params: any) {
         throw errorMsg.objectNotExsitFn("订单号");
     }
 
-    params.createTime = new Date();
     await order.update(params, { where: { id: order.id } });
     return;
 }
 
 export async function confirmOrder(orderNumber: string) {
-    let order: any = db.Order.findOne({ where: { orderNumber: orderNumber, status: 1 } });
+    let order: any = await db.Order.findOne({ where: { orderNumber: orderNumber, status: 1 } });
 
     if (_.isEmpty(order)) {
         throw errorMsg.objectNotExsitFn("订单号");
@@ -56,32 +92,24 @@ export async function confirmOrder(orderNumber: string) {
     return;
 }
 
-export async function completeOrder(orderNumber: string) {
-    let order: any = db.Order.findOne({ where: { orderNumber: orderNumber, status: 2 } });
+export async function recoverOrder(orderNumber: string) {
+    let order: any = await db.Order.findOne({ where: { orderNumber: orderNumber, status: 4 } });
 
     if (_.isEmpty(order)) {
         throw errorMsg.objectNotExsitFn("订单号");
     }
-    order.status = 3;
-    order.completeTime = new Date();
+    if (!_.isEmpty(order.completeTime)) {
+        order.status = 2;
+    } else {
+        order.status = 1;
+    }
+    order.cancelTime = null;
     await order.save();
     return;
 }
 
-// export async function deleteOrder(orderNumber: string) {
-//     let order: any = db.Order.findOne({ where: { orderNumber: orderNumber, status: 3 } });
-
-//     if (_.isEmpty(order)) {
-//         throw errorMsg.objectNotExsitFn("订单号");
-//     }
-//     order.status = 5;
-//     order.deleteTime = new Date();
-//     await order.save();
-//     return;
-// }
-
 export async function cancelOrder(orderNumber: string) {
-    let order: any = db.Order.findOne({ where: { orderNumber: orderNumber } });
+    let order: any = await db.Order.findOne({ where: { orderNumber: orderNumber } });
 
     if (_.isEmpty(order)) {
         throw errorMsg.objectNotExsitFn("订单号");
@@ -108,7 +136,7 @@ export async function statisticsOrder() {
     });
     let distributes: any = await db.Order.findAll({
         where: { status: 3 },
-        attributes: ["source", [Sequelize.fn("count", Sequelize.col("source")), "countSource"]],
+        attributes: ["source", [Sequelize.fn("sum", Sequelize.col("salesVolume")), "salesTotal"]],
         group: "source"
     });
     let i: number = 0;
@@ -119,40 +147,42 @@ export async function statisticsOrder() {
     return query;
 }
 
-export async function trendOrder(time: string, startTime: string, endTime: string) {
+export async function trendOrder(query: any) {
     let whereOptions: any = {};
     whereOptions.status = 3;
     let timeOptions: string = "%Y-%m-%d";
 
-    if (time === "year") {
-        timeOptions = "%Y";
-    }
-
-    if (time === "month") {
+    if (query.time === "year") {
         let thisYear = (new Date()).getFullYear();
         let startTime = new Date("1/1/" + thisYear);
         whereOptions.createTime = { $gte: startTime };
         timeOptions = "%Y-%m";
     }
-    if (time === "week") {
+    if (query.time === "week") {
         let lastMs: number = (new Date()).getTime() - 7 * 24 * 60 * 60 * 1000;
         let lastDate = new Date(lastMs);
         whereOptions.createTime = { $between: [lastDate, new Date()] };
     }
-    if (time === "day") {
+    if (query.time === "month") {
         let thisYear = (new Date()).getFullYear();
         let thisMonth: number = (new Date()).getMonth();
         let startTime = new Date(thisYear, thisMonth, 1);
         whereOptions.createTime = { $gte: startTime };
     }
 
-    if (time === "range") {
-        whereOptions.createTime = { $between: [startTime, endTime] };
+    if (query.time === "range") {
+        if (!_.isEmpty(query.startTime)) {
+            if (_.isEmpty(query.endTime)) {
+                query.endTime = new Date();
+            }
+        whereOptions.createTime = { $between: [query.startTime, query.endTime] };
+        }
     }
-    let result: any = db.Order.findAll({
+    let result: any = await db.Order.findAll({
         where: whereOptions,
         attributes: [
             [Sequelize.fn("DATE_FORMAT", Sequelize.col("createTime"), timeOptions), "time"],
+            [Sequelize.fn("count", Sequelize.col("orderNumber")), "orderCount"],
             [Sequelize.fn("sum", Sequelize.col("salesVolume")), "salesTotal"],
             [Sequelize.fn("sum", Sequelize.col("profit")), "profitTotal"],
             [Sequelize.fn("sum", Sequelize.col("netProfit")), "netProfitTotal"]],

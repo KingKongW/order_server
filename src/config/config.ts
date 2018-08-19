@@ -22,3 +22,7 @@ export const server: any = {
         maxIdleTime: 30     // 连接超时
     }
 };
+
+export const withoutRightValidationURL: any = [
+    "/login", "/api/login"
+];

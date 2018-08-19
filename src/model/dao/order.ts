@@ -16,7 +16,7 @@ export interface OrderInterface {
     entityTicketQuantity: number;
     externalOrderNumber: string;
     orderBelong: string;
-    orderBelong_id: number;
+    orderBelongId: number;
     goodsName: string;
     goodsCode?: string;
     supplier: string;
@@ -84,7 +84,7 @@ export function define(sequelize: Sequelize.Sequelize): OrderInterface {
         "entityTicketQuantity": { type: Sequelize.INTEGER(11), defaultValue: 0, allowNull: false },
         "externalOrderNumber": { type: Sequelize.STRING(50), allowNull: false },
         "orderBelong": { type: Sequelize.STRING(50), allowNull: false },
-        "orderBelong_id": { type: Sequelize.INTEGER(50), allowNull: false },
+        "orderBelongId": { type: Sequelize.INTEGER(50), allowNull: false },
         "goodsName": { type: Sequelize.STRING(50), allowNull: false },
         "goodsCode": { type: Sequelize.STRING(50) },
         "supplier": { type: Sequelize.STRING(50), allowNull: false },

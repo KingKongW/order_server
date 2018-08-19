@@ -4,12 +4,12 @@ import { checkPageParams } from "../middlewares/page";
 
 export = function (router: router) {
   router.get("/api/order", checkPageParams, getOrder);
-  router.get("/api/confirm", confirmOrder);
-  router.post("/api/upload", uploadOrders);
-  router.post("/api/change", changeOrder);
-  router.get("/api/over", completeOrder);
-  // router.delete("/api/delete", deleteOrder);
-  router.get("/api/cancel", cancelOrder);
+  router.post("/api/order/confirm", confirmOrder);
+  router.post("/api/order/upload", uploadOrders);
+  router.get("/api/order/export", exportOrders);
+  router.post("/api/order/change", changeOrder);
+  router.post("/api/order/recover", recoverOrder);
+  router.post("/api/order/cancel", cancelOrder);
   router.get("/api/finance/statistics", statisticsOrder);
   router.get("/api/finance/trend", trendOrder);
 };
@@ -21,54 +21,57 @@ async function getOrder() {
 }
 
 async function confirmOrder() {
-  this.checkQuery("orderNumber").notEmpty("订单号不能为空！");
-  await order.confirmOrder(this.query.orderNumber);
-  return;
+  let orders: any = this.request.body;
+  for (let iterm of orders.orders) {
+    await order.confirmOrder(iterm);
+  }
+  this.body = {};
 }
 
 async function changeOrder() {
-  let orders: any = this.request.body;
-  for (let iterm of orders) {
-    await order.changeOrder(iterm);
-  }
+  let body: any = this.request.body;
+  await order.changeOrder(body.order);
   this.body = {};
 }
 
 async function uploadOrders() {
   let orders: any = this.request.body;
-  for (let iterm of orders) {
+  for (let iterm of orders.orders) {
     await order.uploadOrder(iterm);
   }
 
   this.body = {};
 }
 
-async function completeOrder() {
-  this.checkQuery("orderNumber").notEmpty("订单号不能为空！");
-  await order.completeOrder(this.query.orderNumber);
-  return;
+async function exportOrders() {
+  let orders: any = await order.exportOrders(this.query​​);
+  this.body = orders;
 }
 
-// async function deleteOrder() {
-//   this.checkQuery("orderNumber").notEmpty("订单号不能为空！");
-//   await order.deleteOrder(this.query.orderNumber);
-//   return;
-// }
+async function recoverOrder() {
+  let orders: any = this.request.body;
+  for (let iterm of orders.orders) {
+    await order.recoverOrder(iterm);
+  }
+
+  this.body = {};
+}
 
 async function cancelOrder() {
-  this.checkQuery("orderNumber").notEmpty("订单号不能为空！");
-  await order.cancelOrder(this.query.orderNumber);
-  return;
+  let orders: any = this.request.body;
+  for (let iterm of orders.orders) {
+    await order.cancelOrder(iterm);
+  }
+
+  this.body = {};
 }
 
 async function statisticsOrder() {
   let body: any = await order.statisticsOrder();
   this.body = body;
-  return;
 }
 
 async function trendOrder() {
-  let body = await order.trendOrder(this.query.time, this.query.startTime, this.quey.endTime);
+  let body = await order.trendOrder(this.query);
   this.body = body;
-  return;
 }
